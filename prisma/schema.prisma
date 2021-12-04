@@ -1,0 +1,271 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Auction {
+  id           Int      @id @default(autoincrement())
+  margin       Int?
+  price        Int?
+  is_triggered Boolean  @default(false)
+  is_sell      Boolean  @default(false)
+  user_id      Int      @unique
+  created_at   DateTime @default(now()) @db.DateTime(0)
+  updated_at   DateTime @default(now()) @db.DateTime(0)
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Auction_user_id_foreign")
+
+  @@index([user_id], map: "Auction_user_id_foreign")
+}
+
+model Bill {
+  id           Int      @id @default(autoincrement())
+  seller_id    Int
+  buyer_id     Int
+  price        Int?
+  total_amount Int?
+  left_amount  Int?
+  is_sell      Boolean
+  is_settled   Boolean
+  user_id      Int
+  created_at   DateTime @default(now()) @db.DateTime(0)
+  updated_at   DateTime @default(now()) @db.DateTime(0)
+  user         User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Bill_user_id_foreign")
+
+}
+
+model Blockoperation {
+  id           Int           @id @default(autoincrement())
+  operator_id  Int
+  created_at   DateTime      @default(now()) @db.DateTime(0)
+  updated_at   DateTime      @default(now()) @db.DateTime(0)
+  blockresults Blockresult[]
+}
+
+model Blockresult {
+  id             Int            @id @default(autoincrement())
+  commition      Decimal?       @db.Decimal(8, 2)
+  user_id        Int
+  operation_id   Int
+  created_at     DateTime       @default(now()) @db.DateTime(0)
+  updated_at     DateTime       @default(now()) @db.DateTime(0)
+  blockoperation Blockoperation @relation(fields: [operation_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Blockresult_operation_id_foreign")
+  user           User           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Blockresult_user_id_foreign")
+
+  @@index([operation_id], map: "Blockresult_operation_id_foreign")
+  @@index([user_id], map: "Blockresult_user_id_foreign")
+}
+
+model Block {
+  id         Int      @id @default(autoincrement())
+  amount     Int
+  is_sell    Boolean
+  user_id    Int      @unique
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @default(now()) @db.DateTime(0)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Block_user_id_foreign")
+
+  @@index([user_id], map: "Block_user_id_foreign")
+}
+
+model Chargeinfo {
+  id          Int      @id @default(autoincrement())
+  charge      Decimal  @default(0.00) @db.Decimal(8, 2)
+  base_charge Decimal  @default(0.00) @db.Decimal(8, 2)
+  vip_off     Decimal  @default(0.00) @db.Decimal(8, 2)
+  user_id     Int      @unique
+  created_at  DateTime @default(now()) @db.DateTime(0)
+  updated_at  DateTime @default(now()) @db.DateTime(0)
+  user        User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Chargeinfo_user_id_foreign")
+
+  @@index([user_id], map: "Chargeinfo_user_id_foreign")
+}
+
+model Commition {
+  id         Int      @id @default(autoincrement())
+  user_id    Int
+  amount     Decimal? @db.Decimal(8, 2)
+  is_settled Boolean  @default(false)
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @default(now()) @db.DateTime(0)
+}
+
+model Deal {
+  id         Int            @id @default(autoincrement())
+  buy_price  Decimal?       @db.Decimal(8, 2)
+  sell_price Decimal?       @db.Decimal(8, 2)
+  amount     Int?
+  profit     Decimal?       @db.Decimal(8, 2)
+  commition  Decimal?       @db.Decimal(8, 2)
+  is_sell    Boolean
+  is_settled Boolean        @default(false)
+  condition  Deal_condition @default(normal)
+  user_id    Int
+  created_at DateTime       @default(now()) @db.DateTime(0)
+  updated_at DateTime       @default(now()) @db.DateTime(0)
+  user       User           @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Deal_user_id_foreign")
+
+  @@index([user_id], map: "Deal_user_id_foreign")
+}
+
+model Document {
+  id         Int      @id @default(autoincrement())
+  file       String   @db.VarChar(255)
+  file_type  String   @db.VarChar(255)
+  user_id    Int
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @default(now()) @db.DateTime(0)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Document_user_id_foreign")
+
+  transactions Transaction?
+  @@index([user_id], map: "Document_user_id_foreign")
+}
+
+model Gift {
+  id         Int      @id @default(autoincrement())
+  activated  Boolean  @default(false)
+  charge     Decimal  @db.Decimal(8, 2)
+  trigger    Decimal  @db.Decimal(8, 2)
+  user_id    Int
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @default(now()) @db.DateTime(0)
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Gift_user_id_foreign")
+
+  @@index([user_id], map: "Gift_user_id_foreign")
+}
+
+model Offer {
+  id           Int             @id @default(autoincrement())
+  condition    Offer_condition @default(normal)
+  price        Int?
+  total_amount Int?
+  left_amount  Int?
+  is_sell      Boolean
+  is_expired   Boolean
+  user_id      Int
+  created_at   DateTime        @default(now()) @db.DateTime(0)
+  updated_at   DateTime        @default(now()) @db.DateTime(0)
+  user         User            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Offer_user_id_foreign")
+
+  @@index([user_id], map: "Offer_user_id_foreign")
+}
+
+model Refer {
+  id         Int      @id @default(autoincrement())
+  referer_id Int
+  user_id    Int
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @default(now()) @db.DateTime(0)
+  referer    User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Refer_user_id_foreign")
+
+  @@index([user_id], map: "Refer_user_id_foreign")
+}
+
+model Settleresult {
+  id         Int      @id @default(autoincrement())
+  profit     Decimal? @db.Decimal(8, 2)
+  commition  Decimal? @db.Decimal(8, 2)
+  user_id    Int
+  settle_id  Int
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @default(now()) @db.DateTime(0)
+  settles    Settle   @relation(fields: [settle_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Settleresult_settle_id_foreign")
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Settleresult_user_id_foreign")
+
+  @@index([settle_id], map: "Settleresult_settle_id_foreign")
+  @@index([user_id], map: "Settleresult_user_id_foreign")
+}
+
+model Settle {
+  id            Int            @id @default(autoincrement())
+  price         Decimal        @db.Decimal(8, 2)
+  operator_id   Int
+  created_at    DateTime       @default(now()) @db.DateTime(0)
+  updated_at    DateTime       @default(now()) @db.DateTime(0)
+  settleresults Settleresult[]
+}
+
+model Transaction {
+  id               Int                          @id @default(autoincrement())
+  operator_id      Int?
+  amount           Int?
+  amount_text      String?                      @db.VarChar(255)
+  document_id      Int?                         @unique
+  description      String?                      @db.VarChar(255)
+  transaction_type Transaction_transaction_type
+  is_confirmed     Boolean                      @default(false)
+  is_done          Boolean                      @default(false)
+  user_id          Int
+  created_at       DateTime                     @default(now()) @db.DateTime(0)
+  updated_at       DateTime                     @default(now()) @db.DateTime(0)
+  user             User                         @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Transaction_user_id_foreign")
+  document         Document?                    @relation(fields: [document_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "Transaction_document_id_foreign")
+
+  @@index([user_id], map: "Transaction_user_id_foreign")
+  @@index([document_id], map: "Transaction_document_id_foreign")
+}
+
+model User {
+  id             Int            @id @default(autoincrement())
+  username       String         @unique @db.VarChar(255)
+  email          String         @unique @db.VarChar(255)
+  password       String         @db.VarChar(255)
+  role           User_role      @default(member)
+  name           String?        @db.VarChar(255)
+  phone          String?        @db.VarChar(255)
+  bank_name      String?        @db.VarChar(255)
+  bank_number    String?        @db.VarChar(255)
+  refer_id       String         @unique(map: "refer_id") @db.VarChar(255)
+  accepted_terms Boolean        @default(false)
+  verified       Boolean        @default(false)
+  created_at     DateTime       @default(now()) @db.DateTime(0)
+  updated_at     DateTime       @default(now()) @db.DateTime(0)
+  auction        Auction?
+  bills          Bill[]
+  blockresults   Blockresult[]
+  block          Block?
+  chargeinfo     Chargeinfo?
+  deals          Deal[]
+  documents      Document[]
+  gifts          Gift[]
+  offers         Offer[]
+  refers         Refer[]
+  settleresults  Settleresult[]
+  transactions   Transaction[]
+}
+
+model Session {
+  id        String   @id
+  sid       String   @unique
+  data      String
+  expiresAt DateTime
+}
+
+enum Deal_condition {
+  normal
+  auction
+  settle
+}
+
+enum Offer_condition {
+  normal
+  auction
+}
+
+enum Transaction_transaction_type {
+  charge
+  discharge
+  admin_charge
+  admin_discharge
+  gift
+}
+
+enum User_role {
+  owner
+  admin
+  member
+  vip
+}
