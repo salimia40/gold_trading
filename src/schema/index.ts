@@ -14,6 +14,7 @@ import nullGuard from "./plugins/nullguard";
 
 import * as userQueries from "./user/userQueries";
 import * as userMutations from "./user/userMutations";
+import * as transactionMutations from "./transaction/transactionMutations";
 
 import * as ModelTypes from "./types/model_types";
 
@@ -49,6 +50,7 @@ const ActionResult = objectType({
   name: "ActionResult",
   definition(t) {
     t.nonNull.boolean("success");
+    t.nullable.string("error");
   },
 });
 
@@ -64,6 +66,7 @@ const schemaWithoutPermissions = makeSchema({
     AuthMutations,
     userQueries,
     userMutations,
+    transactionMutations,
   ],
   outputs: {
     schema: __dirname + "../../schema.graphql",

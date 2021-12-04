@@ -2,13 +2,6 @@
 
 a financial trading server built with nodejs and typescript
 
-<p align="center">
-
-
-<a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-brightgreen"/></a>
-
-</p>
-
 ## Get started
 
 ### Instalation
@@ -41,9 +34,9 @@ To get started visit wait for me to write some or dive in!
   - [ ] Inform admins about the new user and ask for confirmation
 - [ ] User management
   - [x] Change User role
-  - [ ] Access control based on role
+  - [x] Access control based on role
   - [ ] Edit user info
-  - [ ] Charge a user directly
+  - [x] Charge a user directly
   - [x] View users
   - [ ] View user transactions
   - [ ] View user trades and deals 
@@ -62,11 +55,7 @@ To get started visit wait for me to write some or dive in!
   - [ ] Last settle report
   - [ ] Settle history
 - [x] Setting service
-- [ ] Trading options
+- [ ] Trading
   - [ ] Enable/Disable trading
   - [ ] Enable/Disable public trade reports
 
-
-## License
-
-This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
