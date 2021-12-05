@@ -135,3 +135,72 @@ export const dischargeRequest = mutationField("dischargeRequest", {
     return { success: true };
   },
 });
+
+export const confirmTransaction = mutationField("confirmTransaction", {
+  type: "ActionResult",
+  args: {
+    transaction_id: nonNull(intArg()),
+  },
+  resolve: async (_, { transaction_id }, context) => {
+    let transaction = await context.prisma.transaction.findUnique({
+      where: { id: transaction_id },
+    });
+    if (transaction?.transaction_type == "charge") {
+      await context.prisma.chargeinfo.update({
+        where: { user_id: transaction?.user_id },
+        data: {
+          charge: {
+            increment: transaction?.amount!,
+          },
+        },
+      });
+
+      await context.prisma.transaction.update({
+        where: { id: transaction_id },
+        data: {
+          is_confirmed: true,
+          is_done: true,
+        },
+      });
+    } else {
+      await context.prisma.transaction.update({
+        where: { id: transaction_id },
+        data: {
+          is_confirmed: true,
+        },
+      });
+    }
+
+    return { success: true };
+  },
+});
+
+export const doTransaction = mutationField("doTransaction", {
+  type: "ActionResult",
+  args: {
+    transaction_id: nonNull(intArg()),
+  },
+  resolve: async (_, { transaction_id }, context) => {
+    let transaction = await context.prisma.transaction.findUnique({
+      where: { id: transaction_id },
+    });
+    if (transaction?.transaction_type == "discharge") {
+      await context.prisma.chargeinfo.update({
+        where: { user_id: transaction?.user_id },
+        data: {
+          charge: {
+            decrement: transaction?.amount!,
+          },
+        },
+      });
+    }
+    await context.prisma.transaction.update({
+      where: { id: transaction_id },
+      data: {
+        is_done: true,
+      },
+    });
+
+    return { success: true };
+  },
+});

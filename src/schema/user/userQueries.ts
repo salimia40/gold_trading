@@ -118,7 +118,7 @@ export const getUser = queryField("getUser", {
 });
 
 export const me = queryField("me", {
-  type: "AuthPayload",
+  type: "UserResult",
   // @ts-ignore
   resolve: async (parent, args, context: Context) => {
     const user = await context.prisma.user.findUnique({
@@ -132,6 +132,6 @@ export const me = queryField("me", {
         gifts: true,
       },
     });
-    return { success: true, user: user };
+    return { user: user };
   },
 });

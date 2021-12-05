@@ -14,6 +14,7 @@ import nullGuard from "./plugins/nullguard";
 import * as userQueries from "./user/userQueries";
 import * as userMutations from "./user/userMutations";
 import * as transactionMutations from "./transaction/transactionMutations";
+import * as transactionQueries from "./transaction/transactionQueries";
 
 import * as ModelTypes from "./types/model_types";
 
@@ -67,6 +68,7 @@ const schemaWithoutPermissions = makeSchema({
     userQueries,
     userMutations,
     transactionMutations,
+    transactionQueries,
     Upload,
   ],
   outputs: {

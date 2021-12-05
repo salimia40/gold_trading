@@ -1,4 +1,4 @@
-import { allow, or, rule, shield } from "graphql-shield";
+import { allow, and, or, rule, shield } from "graphql-shield";
 import { Context } from "./context";
 
 const rules = {
@@ -16,15 +16,41 @@ const rules = {
 export const permissions = shield({
   Query: {
     me: rules.isAuthenticatedUser,
-    getUser: or(rules.isAdmin, rules.isOwner),
-    getUsers: or(rules.isAdmin, rules.isOwner),
+    getUser: and(rules.isAuthenticatedUser, or(rules.isAdmin, rules.isOwner)),
+    getUsers: and(rules.isAuthenticatedUser, or(rules.isAdmin, rules.isOwner)),
   },
   Mutation: {
     login: allow,
     signup: allow,
     logout: allow,
-    verifyUser: or(rules.isAdmin, rules.isOwner),
-    changeUserVipSettings: or(rules.isAdmin, rules.isOwner),
-    changeUserRole: rules.isOwner,
+    verifyUser: and(
+      rules.isAuthenticatedUser,
+      or(rules.isAdmin, rules.isOwner),
+    ),
+    changeUserVipSettings: and(
+      rules.isAuthenticatedUser,
+      or(rules.isAdmin, rules.isOwner),
+    ),
+    changeUserRole: and(rules.isAuthenticatedUser, rules.isOwner),
+    chargeUser: and(
+      rules.isAuthenticatedUser,
+      or(rules.isAdmin, rules.isOwner),
+    ),
+    chargeRequest: and(
+      rules.isAuthenticatedUser,
+      or(rules.isAdmin, rules.isOwner),
+    ),
+    dischargeRequest: and(
+      rules.isAuthenticatedUser,
+      or(rules.isAdmin, rules.isOwner),
+    ),
+    confirmTransaction: and(
+      rules.isAuthenticatedUser,
+      or(rules.isAdmin, rules.isOwner),
+    ),
+    doTransaction: and(
+      rules.isAuthenticatedUser,
+      or(rules.isAdmin, rules.isOwner),
+    ),
   },
 });
