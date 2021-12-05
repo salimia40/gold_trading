@@ -70,7 +70,7 @@ const schemaWithoutPermissions = makeSchema({
     Upload,
   ],
   outputs: {
-    schema: __dirname + "../../schema.graphql",
+    schema: __dirname + "./schema.graphql",
     typegen: __dirname + "/generated/nexus.ts",
   },
   contextType: {

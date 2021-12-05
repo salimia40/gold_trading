@@ -1,5 +1,7 @@
 # Gold trading
 
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
+
 a financial trading server built with nodejs and typescript
 
 ## Get started
@@ -15,6 +17,10 @@ create `.env` file in project root with items below:
 ```
 DATABASE_URL=
 REDIS_URL=
+MINIO_URL="
+MINIO_PORT=
+MINIO_USER=
+MINIO_PASS=
 ```
 
 ### Run the server
@@ -25,38 +31,4 @@ To get started visit wait for me to write some or dive in!
 
 ### Dependencies
 
-
-## Tasks
-- [ ] Signup prossess
-  - [ ] Persian names only
-  - [ ] Validate phone and [sheba number](https://www.refah-bank.ir/1557/index.aspx?tabindex=2#:~:text=What%20is%20Sheba%3F,exclusively%20in%20Iran's%20banking%20system.)
-  - [x] First user become Owner
-  - [ ] Inform admins about the new user and ask for confirmation
-- [ ] User management
-  - [x] Change User role
-  - [x] Access control based on role
-  - [ ] Edit user info
-  - [x] Charge a user directly
-  - [x] View users
-  - [ ] View user transactions
-  - [ ] View user trades and deals 
-  - [x] Vip settings
-    - [X] Show vip users 
-    - [x] Base charge
-    - [x] Bargains / vip off
-- [ ] Admin features
-  - [ ] Commition
-  - [ ] Quotation
-  - [ ] Automated quotation
-  - [ ] Block
-  - [ ] Last block report
-  - [ ] Block history
-  - [ ] Settle
-  - [ ] Last settle report
-  - [ ] Settle history
-- [x] Setting service
-- [X] Storage service
-- [ ] Trading
-  - [ ] Enable/Disable trading
-  - [ ] Enable/Disable public trade reports
 
