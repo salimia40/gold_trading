@@ -1,5 +1,16 @@
 import { Transaction_transaction_type } from ".prisma/client";
-import { booleanArg, floatArg, intArg, mutationField, nonNull } from "nexus";
+import {
+  arg,
+  booleanArg,
+  floatArg,
+  intArg,
+  mutationField,
+  nonNull,
+  stringArg,
+} from "nexus";
+
+import fs from "fs";
+import path from "path";
 
 export const chargeUser = mutationField("chargeUser", {
   type: "ActionResult",
@@ -50,6 +61,23 @@ export const chargeUser = mutationField("chargeUser", {
         amount,
       },
     });
+
+    return { success: true };
+  },
+});
+
+export const chargeRequest = mutationField("chargeRequest", {
+  type: "ActionResult",
+  args: {
+    document: nonNull(arg({ type: "Upload" })),
+    amount: nonNull(intArg()),
+    amount_text: nonNull(stringArg()),
+  },
+  resolve: async (_, { document, amount, amount_text }, context) => {
+    const { createReadStream, filename } = await document;
+    const stream = createReadStream();
+    const pathname = path.join(__dirname, filename);
+    stream.pipe(fs.createWriteStream(pathname));
 
     return { success: true };
   },

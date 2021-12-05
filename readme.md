@@ -55,6 +55,7 @@ To get started visit wait for me to write some or dive in!
   - [ ] Last settle report
   - [ ] Settle history
 - [x] Setting service
+- [X] Storage service
 - [ ] Trading
   - [ ] Enable/Disable trading
   - [ ] Enable/Disable public trade reports

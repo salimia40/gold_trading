@@ -1,5 +1,4 @@
 import { applyMiddleware } from "graphql-middleware";
-import { GraphQLUpload } from "graphql-upload";
 import { DateTimeResolver } from "graphql-scalars";
 
 import {
@@ -21,6 +20,8 @@ import * as ModelTypes from "./types/model_types";
 import { permissions } from "./permissions";
 
 import { AuthMutations } from "./authentication";
+import { uptime } from "process";
+import { Upload } from "./upload";
 
 export const DateTime = asNexusMethod(DateTimeResolver, "date");
 
@@ -62,11 +63,11 @@ const schemaWithoutPermissions = makeSchema({
     PaginationResult,
     ActionResult,
     ModelTypes,
-    GraphQLUpload,
     AuthMutations,
     userQueries,
     userMutations,
     transactionMutations,
+    Upload,
   ],
   outputs: {
     schema: __dirname + "../../schema.graphql",
