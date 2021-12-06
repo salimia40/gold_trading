@@ -9,7 +9,11 @@ export const updateSettings = mutationField("updateSettings", {
     "GIFT_ON_SIGNUP": nullable(booleanArg()),
     "GIFT_ON_FIRSTCHARGE": nullable(booleanArg()),
     "TARADING_ACTIVATED": nullable(booleanArg()),
+    "DISCHARGE_ACTIVATED": nullable(booleanArg()),
+    "OFFER_AGE": nullable(booleanArg()),
+    "OFFER_EXPIRE": nullable(intArg()),
     "QUOTATION": nullable(intArg()),
+    "TOLERENCE": nullable(intArg()),
     "COMMITION": nullable(intArg()),
   },
   resolve: async (
@@ -22,6 +26,10 @@ export const updateSettings = mutationField("updateSettings", {
       TARADING_ACTIVATED,
       QUOTATION,
       COMMITION,
+      TOLERENCE,
+      DISCHARGE_ACTIVATED,
+      OFFER_AGE,
+      OFFER_EXPIRE,
     },
     constext,
   ) => {
@@ -45,6 +53,18 @@ export const updateSettings = mutationField("updateSettings", {
     }
     if (COMMITION != null) {
       await setting.set("COMMITION", COMMITION!);
+    }
+    if (TOLERENCE != null) {
+      await setting.set("TOLERENCE", TOLERENCE!);
+    }
+    if (DISCHARGE_ACTIVATED != null) {
+      await setting.set("DISCHARGE_ACTIVATED", DISCHARGE_ACTIVATED!);
+    }
+    if (OFFER_AGE != null) {
+      await setting.set("OFFER_AGE", OFFER_AGE!);
+    }
+    if (OFFER_EXPIRE != null) {
+      await setting.set("OFFER_EXPIRE", OFFER_EXPIRE!);
     }
 
     let settings = await setting.getAll();

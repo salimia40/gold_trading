@@ -9,6 +9,10 @@ type SETTINGS =
   | "GIFT_ON_FIRSTCHARGE"
   | "TARADING_ACTIVATED"
   | "QUOTATION"
+  | "TOLERENCE"
+  | "DISCHARGE_ACTIVATED"
+  | "OFFER_AGE"
+  | "OFFER_EXPIRE"
   | "COMMITION";
 
 const settingItems: SETTINGS[] = [
@@ -18,7 +22,11 @@ const settingItems: SETTINGS[] = [
   "GIFT_ON_FIRSTCHARGE",
   "TARADING_ACTIVATED",
   "QUOTATION",
+  "TOLERENCE",
   "COMMITION",
+  "DISCHARGE_ACTIVATED",
+  "OFFER_AGE",
+  "OFFER_EXPIRE",
 ];
 
 const settings = {
@@ -34,11 +42,27 @@ const settings = {
     type: "number",
     default: 10000,
   },
+  "TOLERENCE": {
+    type: "number",
+    default: 5,
+  },
   "VIP_OFF": {
     type: "number",
     default: 10,
   },
+  "OFFER_AGE": {
+    type: "number",
+    default: 10,
+  },
+  "OFFER_EXPIRE": {
+    type: "boolean",
+    default: false,
+  },
   "GIFT_ON_SIGNUP": {
+    type: "boolean",
+    default: false,
+  },
+  "DISCHARGE_ACTIVATED": {
     type: "boolean",
     default: false,
   },

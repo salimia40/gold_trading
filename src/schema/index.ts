@@ -17,13 +17,13 @@ import * as transactionMutations from "./transaction/transactionMutations";
 import * as transactionQueries from "./transaction/transactionQueries";
 import * as settingQueries from "./setting/settingQueries";
 import * as settingMutations from "./setting/settingMutations";
+import * as tradingMutations from "./trading/tradingMutations";
 
 import * as ModelTypes from "./types/model_types";
 
 import { permissions } from "./permissions";
 
 import { AuthMutations } from "./authentication";
-import { uptime } from "process";
 import { Upload } from "./upload";
 
 export const DateTime = asNexusMethod(DateTimeResolver, "date");
@@ -74,6 +74,7 @@ const schemaWithoutPermissions = makeSchema({
     Upload,
     settingQueries,
     settingMutations,
+    tradingMutations,
   ],
   outputs: {
     typegen: __dirname + "/generated/nexus.ts",

@@ -9,8 +9,12 @@ export const Settings = objectType({
     t.nullable.boolean("GIFT_ON_SIGNUP");
     t.nullable.boolean("GIFT_ON_FIRSTCHARGE");
     t.nullable.boolean("TARADING_ACTIVATED");
+    t.nullable.boolean("DISCHARGE_ACTIVATED");
+    t.nullable.boolean("OFFER_EXPIRE");
     t.nullable.int("QUOTATION");
+    t.nullable.int("OFFER_AGE");
     t.nullable.int("COMMITION");
+    t.nullable.int("TOLERENCE");
   },
 });
 
