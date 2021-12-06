@@ -53,21 +53,21 @@ export const getUsers = queryField("getUsers", {
     const countQ: Prisma.UserCountArgs = {};
     query.where = {};
     countQ.where = {};
-    if (role !== null) {
+    if (role != null) {
       query.where.role = role;
       countQ.where.role = role;
     }
-    if (verified !== null) {
+    if (verified != null) {
       query.where.verified = verified;
       countQ.where.verified = verified;
     }
-    if (sort !== null) {
+    if (sort != null) {
       query.orderBy = {
         created_at: sort,
       };
     }
 
-    if (pagination !== null) {
+    if (pagination != null) {
       let totalPage: number, perPage: number, page: number;
       let total = await prisma.user.count(countQ);
       perPage = pagination?.perPage || 10;

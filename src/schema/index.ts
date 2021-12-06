@@ -15,6 +15,8 @@ import * as userQueries from "./user/userQueries";
 import * as userMutations from "./user/userMutations";
 import * as transactionMutations from "./transaction/transactionMutations";
 import * as transactionQueries from "./transaction/transactionQueries";
+import * as settingQueries from "./setting/settingQueries";
+import * as settingMutations from "./setting/settingMutations";
 
 import * as ModelTypes from "./types/model_types";
 
@@ -70,9 +72,10 @@ const schemaWithoutPermissions = makeSchema({
     transactionMutations,
     transactionQueries,
     Upload,
+    settingQueries,
+    settingMutations,
   ],
   outputs: {
-    schema: __dirname + "./schema.graphql",
     typegen: __dirname + "/generated/nexus.ts",
   },
   contextType: {

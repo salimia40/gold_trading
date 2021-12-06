@@ -45,29 +45,29 @@ export const getTransactions = queryField("getTransactions", {
     const countQ: Prisma.TransactionCountArgs = {};
     query.where = {};
     countQ.where = {};
-    if (is_confirmed !== null) {
+    if (is_confirmed != null) {
       query.where.is_confirmed = is_confirmed;
       countQ.where.is_confirmed = is_confirmed;
     }
-    if (is_done !== null) {
+    if (is_done != null) {
       query.where.is_done = is_done;
       countQ.where.is_done = is_done;
     }
-    if (transaction_type !== null) {
+    if (transaction_type != null) {
       query.where.transaction_type = transaction_type;
       countQ.where.transaction_type = transaction_type;
     }
-    if (user_id !== null) {
+    if (user_id != null) {
       query.where.user_id = user_id;
       countQ.where.user_id = user_id;
     }
-    if (sort !== null) {
+    if (sort != null) {
       query.orderBy = {
         created_at: sort,
       };
     }
 
-    if (pagination !== null) {
+    if (pagination != null) {
       let totalPage: number, perPage: number, page: number;
       let total = await prisma.transaction.count(countQ);
       perPage = pagination?.perPage || 10;
@@ -120,25 +120,25 @@ export const getMyTransactions = queryField("getMyTransactions", {
     countQ.where = {
       user_id: context.getUser()?.id!,
     };
-    if (is_confirmed !== null) {
+    if (is_confirmed != null) {
       query.where.is_confirmed = is_confirmed;
       countQ.where.is_confirmed = is_confirmed;
     }
-    if (is_done !== null) {
+    if (is_done != null) {
       query.where.is_done = is_done;
       countQ.where.is_done = is_done;
     }
-    if (transaction_type !== null) {
+    if (transaction_type != null) {
       query.where.transaction_type = transaction_type;
       countQ.where.transaction_type = transaction_type;
     }
-    if (sort !== null) {
+    if (sort != null) {
       query.orderBy = {
         created_at: sort,
       };
     }
 
-    if (pagination !== null) {
+    if (pagination != null) {
       let totalPage: number, perPage: number, page: number;
       let total = await prisma.transaction.count(countQ);
       perPage = pagination?.perPage || 10;

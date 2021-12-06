@@ -11,6 +11,16 @@ type SETTINGS =
   | "QUOTATION"
   | "COMMITION";
 
+const settingItems: SETTINGS[] = [
+  "BASE_CHARGE",
+  "VIP_OFF",
+  "GIFT_ON_SIGNUP",
+  "GIFT_ON_FIRSTCHARGE",
+  "TARADING_ACTIVATED",
+  "QUOTATION",
+  "COMMITION",
+];
+
 const settings = {
   "BASE_CHARGE": {
     type: "number",
@@ -54,14 +64,15 @@ class Settings {
       (err) => console.log("Redis Client Error", err),
     );
     this.redisClient.connect().then(() => {
+      this.initialize();
     });
   }
 
-  public async initialize() {
+  async initialize() {
     let setuped = await this.redisClient.exists("setuped");
     if (!setuped) {
       this.redisClient.set("setuped", "true");
-      for (const key in settings) {
+      for (const key of settingItems) {
         // @ts-ignore
         this.redisClient.set(key, String(settings[key]?.default));
       }
@@ -80,6 +91,15 @@ class Settings {
       default:
         return s;
     }
+  }
+
+  public async getAll() {
+    let s = {};
+    for (let key of settingItems) {
+      let si = await this.get(key);
+      Object.assign(s, { [key]: si });
+    }
+    return s;
   }
 
   public async set(setting: SETTINGS, value: Setting) {
