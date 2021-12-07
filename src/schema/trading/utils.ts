@@ -1,8 +1,7 @@
 import { Bill } from ".prisma/client";
 import { prisma } from "../../services/db";
 import setting from "../../services/setting";
-import R from "ramda";
-import { forEach } from "p-iteration";
+import { forEach, reduce } from "p-iteration";
 import { Decimal } from "@prisma/client/runtime";
 import { countAuction } from "../../services/auction";
 import { countBlock } from "../../services/block";
@@ -70,20 +69,20 @@ export async function maxCanTrade(user_id: number) {
     },
   });
 
-  let left_amount = R.reduce(
+  let left_amount = await reduce(
+    bills,
     (amount: number, elem: Bill) => {
       return amount + elem.left_amount!;
     },
     0,
-    bills,
   );
 
-  left_amount += R.reduce(
+  left_amount += await reduce(
+    offers,
     (amount: number, elem) => {
       return amount + elem.left_amount!;
     },
     0,
-    offers,
   );
 
   maximum = maximum?.sub(left_amount);
@@ -126,7 +125,7 @@ async function userCommition(user_id: number) {
     commitionFee == 0;
   } else if (user?.role == "vip") {
     if (chargeInfo?.vip_off.gt(0)) {
-      commitionFee = chargeInfo.vip_off.pow(commitionFee).dividedBy(100)
+      commitionFee = chargeInfo.vip_off.mul(commitionFee).dividedBy(100)
         .toNumber();
     } else {
       let vip_off = await setting.get("VIP_OFF") as number;
