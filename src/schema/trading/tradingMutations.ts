@@ -11,6 +11,7 @@ import {
   hasSufficentCharge,
   matchTolerance,
   maxCanTrade,
+  processTrade,
 } from "./utils";
 
 export const OfferPayload = objectType({
@@ -90,5 +91,77 @@ export const cancelOffer = mutationField("cancelOffer", {
       },
     });
     return { success: true, offer };
+  },
+});
+
+export const trade = mutationField("trade", {
+  type: "ActionResult",
+  args: {
+    amount: nonNull(intArg()),
+    offer_id: nonNull(intArg()),
+  },
+  resolve: async (_, { offer_id, amount }, context) => {
+    const user_id = context.getUser()?.id!;
+
+    if (!(await hasSufficentCharge(user_id))) {
+      return {
+        success: false,
+        error: "insufficent charge",
+      };
+    }
+    if ((await maxCanTrade(user_id))?.lt(amount)) {
+      return {
+        success: false,
+        error: "amount exeeds",
+      };
+    }
+
+    const offer = await context.prisma.offer.findUnique({
+      where: { id: offer_id },
+    });
+
+    if (offer?.left_amount! < amount) {
+      return {
+        success: false,
+        error: "amount exeeds offer",
+      };
+    }
+    if (offer?.is_expired) {
+      return {
+        success: false,
+        error: "offer expired",
+      };
+    }
+    if (user_id == offer?.user_id) {
+      return {
+        success: false,
+        error: "cant trade with oneself",
+      };
+    }
+
+    let price = offer?.price!;
+
+    await context.prisma.offer.update({
+      where: { id: offer_id },
+      data: {
+        left_amount: { decrement: amount },
+      },
+    });
+
+    let seller_id = offer?.is_sell ? offer.user_id : user_id;
+    let buyer_id = offer?.is_sell ? user_id : offer?.user_id!;
+
+    /**
+     *  close deals
+     *  update user charge
+     *  recalculate auction
+     * // TODO check auction
+     *  recalculate block
+     */
+
+    await processTrade(seller_id, buyer_id, price, amount, true);
+    await processTrade(seller_id, buyer_id, price, amount, false);
+
+    return { success: true };
   },
 });

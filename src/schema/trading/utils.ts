@@ -1,8 +1,11 @@
-import { Bill, Chargeinfo } from ".prisma/client";
+import { Bill } from ".prisma/client";
 import { prisma } from "../../services/db";
 import setting from "../../services/setting";
 import R from "ramda";
+import { forEach } from "p-iteration";
 import { Decimal } from "@prisma/client/runtime";
+import { countAuction } from "../../services/auction";
+import { countBlock } from "../../services/block";
 
 export async function hasSufficentCharge(user_id: number) {
   const chargeInfo = await prisma.chargeinfo.findUnique({
@@ -103,4 +106,158 @@ export async function autoExpire(offer_id: number) {
       });
     }, age * 1000);
   }
+}
+
+async function userCommition(user_id: number) {
+  const chargeInfo = await prisma.chargeinfo.findUnique({
+    where: {
+      user_id,
+    },
+  });
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: user_id,
+    },
+  });
+
+  let commitionFee = await setting.get("COMMITION") as number;
+  if (user?.role == "owner" || user?.role == "admin") {
+    commitionFee == 0;
+  } else if (user?.role == "vip") {
+    if (chargeInfo?.vip_off.gt(0)) {
+      commitionFee = chargeInfo.vip_off.pow(commitionFee).dividedBy(100)
+        .toNumber();
+    } else {
+      let vip_off = await setting.get("VIP_OFF") as number;
+      commitionFee = (vip_off * commitionFee) / 100;
+    }
+  }
+
+  return commitionFee;
+}
+
+async function makeDeals(bill: Bill) {
+  let amount = bill.left_amount!;
+  let price = bill.price!;
+  let user_id = bill.user_id!;
+  let is_sell = bill.is_sell!;
+
+  let commitionFee = await userCommition(user_id);
+
+  let bills = await prisma.bill.findMany({
+    where: {
+      user_id,
+      is_sell: !bill.is_sell,
+      is_settled: false,
+      left_amount: { gt: 0 },
+    },
+  });
+
+  let profit = 0;
+  let commition = 0;
+
+  await forEach(bills, async (_bill: Bill) => {
+    if (amount == 0) {
+      return;
+    }
+    let sold = (amount > _bill.left_amount!) ? _bill.left_amount! : amount;
+    amount -= sold;
+
+    let sell_price = is_sell ? price : _bill.price!;
+    let buy_price = is_sell ? _bill.price! : price;
+    let _priceDiff = sell_price - buy_price;
+    let _profit = (_priceDiff * sold * 100) / 4.3318;
+    let _commition = sold * commitionFee;
+
+    profit += _profit;
+    commition += -commition;
+
+    await prisma.bill.update({
+      where: {
+        id: _bill.id!,
+      },
+      data: {
+        left_amount: {
+          decrement: sold,
+        },
+      },
+    });
+
+    await prisma.deal.create({
+      data: {
+        user_id,
+        is_sell,
+        amount: sold,
+        sell_price,
+        buy_price,
+        profit: _profit,
+        commition: _commition,
+        condition: "normal",
+      },
+    });
+  });
+
+  return { profit, commition };
+}
+
+async function addCharge(user_id: number, charge: number) {
+  if (charge < 0) {
+    await prisma.chargeinfo.update({
+      where: { user_id },
+      data: {
+        charge: {
+          decrement: Math.abs(charge),
+        },
+      },
+    });
+  } else {
+    await prisma.chargeinfo.update({
+      where: { user_id },
+      data: {
+        charge: {
+          increment: charge,
+        },
+      },
+    });
+  }
+}
+
+export async function processTrade(
+  seller_id: number,
+  buyer_id: number,
+  price: number,
+  amount: number,
+  is_sell: boolean,
+) {
+  let user_id = is_sell ? seller_id : buyer_id;
+  let sellerBill = await prisma.bill.create({
+    data: {
+      user_id,
+      seller_id,
+      buyer_id,
+      is_sell,
+      total_amount: amount,
+      left_amount: amount,
+      price,
+      is_settled: false,
+    },
+  });
+
+  let { profit, commition } = await makeDeals(sellerBill);
+
+  if (commition > 0) {
+    await prisma.commition.create({
+      data: {
+        user_id,
+        amount: commition,
+      },
+    });
+  }
+
+  let charge = profit + commition;
+  await addCharge(user_id, charge);
+
+  await countAuction(user_id);
+  await countBlock(user_id, is_sell);
 }

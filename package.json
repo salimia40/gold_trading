@@ -28,6 +28,7 @@
     "nanoid": "^3.1.30",
     "nexus": "^1.1.0",
     "nexus-plugin-shield": "^0.2.0",
+    "p-iteration": "^1.1.8",
     "passport": "^0.5.0",
     "ramda": "^0.27.1",
     "redis": "^4.0.0"
