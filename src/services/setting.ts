@@ -1,4 +1,5 @@
 import { createClient } from "redis";
+import { priceEvent } from "./auction";
 
 type Setting = number | string | boolean | null;
 
@@ -128,6 +129,9 @@ class Settings {
 
   public async set(setting: SETTINGS, value: Setting) {
     await this.redisClient.set(setting, String(value));
+    if (setting == "QUOTATION") {
+      priceEvent.next(value as number);
+    }
   }
 }
 

@@ -1,6 +1,10 @@
 import { prisma } from "./db";
 import { filter, forEach, reduce } from "p-iteration";
 import setting from "./setting";
+import * as R from "ramda";
+
+import { pipe, Subject } from "rxjs";
+import { Auction } from ".prisma/client";
 
 export async function countAuction(user_id: number) {
   const chargeInfo = await prisma.chargeinfo.findUnique({
@@ -72,4 +76,133 @@ export async function countAuction(user_id: number) {
   });
 
   //   TODO check for auction
+}
+
+export const priceEvent = new Subject<number>();
+
+priceEvent.subscribe({
+  next: (price) => {
+    var min = price - 10;
+    var max = price + 10;
+
+    prisma.auction.findMany().then(
+      pipe(
+        (auctions) =>
+          R.filter(
+            (auction: Auction) =>
+              !auction?.is_triggered && auction.margin != 0 &&
+              auction.price != 0,
+            auctions,
+          ),
+        (auctions) =>
+          R.filter(
+            (auction: Auction) =>
+              (auction.is_sell && auction?.margin! <= max) ||
+              (!auction.is_sell && auction?.margin! >= min),
+            auctions,
+          ),
+        (auctions) => {
+          // TODO alarm user
+          return auctions;
+        },
+        (auctions) =>
+          R.filter(
+            (auction: Auction) =>
+              (auction.is_sell && auction?.margin! <= price) ||
+              (!auction.is_sell && auction?.margin! >= price),
+            auctions,
+          ),
+        (auctions) =>
+          forEach(auctions, async (auction) => {
+            let bills = await prisma.bill.findMany({
+              where: {
+                user_id: auction.user_id,
+                is_sell: auction.is_sell,
+                is_settled: false,
+                left_amount: { gt: 0 },
+              },
+            });
+            let amount = await reduce(bills, (acc, bill) =>
+              acc + bill.left_amount!, 0);
+
+            if (amount > 0) {
+              // TODO alarm user
+
+              await prisma.offer.create({
+                data: {
+                  user_id: auction.user_id,
+                  total_amount: amount,
+                  left_amount: amount,
+                  price: auction.price,
+                  condition: "auction",
+                  is_sell: !auction.is_sell,
+                  is_expired: false,
+                },
+              });
+
+              await prisma.auction.update({
+                where: {
+                  id: auction.id,
+                },
+                data: {
+                  is_triggered: true,
+                },
+              });
+            }
+          }),
+      ),
+    );
+  },
+});
+
+async function checkAuction(user_id: number) {
+  const auction = await prisma.auction.findUnique({ where: { user_id } });
+  const price = (await setting.get("QUOTATION")) as number;
+  var min = price - 10;
+  var max = price + 10;
+  if (
+    (auction?.is_sell && auction?.margin! <= max) ||
+    (!auction?.is_sell && auction?.margin! >= min)
+  ) {
+    // TODO alarm user
+  }
+  if (
+    (auction?.is_sell && auction?.margin! <= price) ||
+    (!auction?.is_sell && auction?.margin! >= price)
+  ) {
+    let bills = await prisma.bill.findMany({
+      where: {
+        user_id: auction!.user_id,
+        is_sell: auction!.is_sell,
+        is_settled: false,
+        left_amount: { gt: 0 },
+      },
+    });
+    let amount = await reduce(bills, (acc, bill) => acc + bill.left_amount!, 0);
+
+    if (amount > 0) {
+      // TODO alarm user
+
+      await prisma.offer.create({
+        data: {
+          user_id: auction?.user_id!,
+          total_amount: amount,
+          left_amount: amount,
+          price: auction?.price!,
+          condition: "auction",
+          is_sell: !auction?.is_sell!,
+          is_expired: false,
+        },
+      });
+
+      await prisma.auction.update({
+        where: {
+          id: auction?.id,
+        },
+        data: {
+          is_triggered: true,
+        },
+      });
+    }
+  }
 }
