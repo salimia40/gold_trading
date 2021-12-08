@@ -1,6 +1,18 @@
 
 todos:
     done:
-        [x] automaticaly check auction on price change
-        [x] check for auction after each trade
+        [x] automaticaly check auction on price change @done
+        [x] check for auction after each trade @done
+    subscriptions:
+        [ ] new users
+        [ ] offers
+        [ ] transactions
+        [ ] settings
+        [ ] user trades and deals
+    management:
+        [ ] settle
+        [x] block
+    planning:
+        [ ] notification service using pusher 
+        [ ] support service using chatwood
     

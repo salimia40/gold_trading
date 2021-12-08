@@ -5,6 +5,7 @@ import { forEach, reduce } from "p-iteration";
 import { Decimal } from "@prisma/client/runtime";
 import { countAuction } from "../../services/auction";
 import { countBlock } from "../../services/block";
+import { userCommition } from "../../services/user";
 
 export async function hasSufficentCharge(user_id: number) {
   const chargeInfo = await prisma.chargeinfo.findUnique({
@@ -105,35 +106,6 @@ export async function autoExpire(offer_id: number) {
       });
     }, age * 1000);
   }
-}
-
-async function userCommition(user_id: number) {
-  const chargeInfo = await prisma.chargeinfo.findUnique({
-    where: {
-      user_id,
-    },
-  });
-
-  const user = await prisma.user.findUnique({
-    where: {
-      id: user_id,
-    },
-  });
-
-  let commitionFee = await setting.get("COMMITION") as number;
-  if (user?.role == "owner" || user?.role == "admin") {
-    commitionFee == 0;
-  } else if (user?.role == "vip") {
-    if (chargeInfo?.vip_off.gt(0)) {
-      commitionFee = chargeInfo.vip_off.mul(commitionFee).dividedBy(100)
-        .toNumber();
-    } else {
-      let vip_off = await setting.get("VIP_OFF") as number;
-      commitionFee = (vip_off * commitionFee) / 100;
-    }
-  }
-
-  return commitionFee;
 }
 
 async function makeDeals(bill: Bill) {

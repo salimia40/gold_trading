@@ -2,6 +2,7 @@ import { prisma } from "./db";
 
 import { nanoid } from "nanoid";
 import { compare, hash } from "bcryptjs";
+import setting from "./setting";
 
 export async function userExists(email: string, username: string) {
   var user = await prisma.user.findUnique({ where: { email } });
@@ -72,4 +73,33 @@ export async function createUser(
 export async function wehaveOwners() {
   var wehaveOwners = await prisma.user.count({ where: { role: "owner" } });
   return !(wehaveOwners === 0);
+}
+
+export async function userCommition(user_id: number) {
+  const chargeInfo = await prisma.chargeinfo.findUnique({
+    where: {
+      user_id,
+    },
+  });
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: user_id,
+    },
+  });
+
+  let commitionFee = await setting.get("COMMITION") as number;
+  if (user?.role == "owner" || user?.role == "admin") {
+    commitionFee == 0;
+  } else if (user?.role == "vip") {
+    if (chargeInfo?.vip_off.gt(0)) {
+      commitionFee = chargeInfo.vip_off.mul(commitionFee).dividedBy(100)
+        .toNumber();
+    } else {
+      let vip_off = await setting.get("VIP_OFF") as number;
+      commitionFee = (vip_off * commitionFee) / 100;
+    }
+  }
+
+  return commitionFee;
 }
