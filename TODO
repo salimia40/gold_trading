@@ -1,0 +1,6 @@
+
+todos:
+    done:
+        [x] automaticaly check auction on price change
+        [x] check for auction after each trade
+    

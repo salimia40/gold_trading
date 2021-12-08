@@ -76,6 +76,7 @@ export async function countAuction(user_id: number) {
   });
 
   //   TODO check for auction
+  await checkAuction(user_id);
 }
 
 export const priceEvent = new Subject<number>();
