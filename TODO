@@ -13,6 +13,9 @@ todos:
         [ ] settle
         [x] block
     planning:
-        [ ] notification service using pusher 
+        [x] notification service using pusher 
         [ ] support service using chatwood
+        [ ] email service
+        [ ] eamil confirmation
+        [ ] password recovery
     
