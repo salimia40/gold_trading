@@ -23,8 +23,8 @@ model Auction {
 
 model Bill {
   id           Int      @id @default(autoincrement())
-  seller_id    Int
-  buyer_id     Int
+  seller_id    Int?
+  buyer_id     Int?
   price        Int?
   total_amount Int?
   left_amount  Int?

@@ -21,6 +21,8 @@ import * as tradingMutations from "./trading/tradingMutations";
 import * as tradingQueries from "./trading/tradingQueries";
 import * as blockMutations from "./block/blockMutations";
 import * as blockQueries from "./block/blockQueries";
+import * as settleMutations from "./settle/settleMutations";
+import * as settleQueries from "./settle/settleQueries";
 
 import * as ModelTypes from "./types/model_types";
 
@@ -81,6 +83,8 @@ const schemaWithoutPermissions = makeSchema({
     tradingQueries,
     blockMutations,
     blockQueries,
+    settleMutations,
+    settleQueries,
   ],
   outputs: {
     typegen: __dirname + "/generated/nexus.ts",

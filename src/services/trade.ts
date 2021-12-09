@@ -1,11 +1,11 @@
 import { Bill } from ".prisma/client";
-import { prisma } from "../../services/db";
-import setting from "../../services/setting";
+import { prisma } from "./db";
+import setting from "./setting";
 import { forEach, reduce } from "p-iteration";
 import { Decimal } from "@prisma/client/runtime";
-import { countAuction } from "../../services/auction";
-import { countBlock } from "../../services/block";
-import { userCommition } from "../../services/user";
+import { countAuction } from "./auction";
+import { countBlock } from "./block";
+import { userCommition } from "./user";
 
 export async function hasSufficentCharge(user_id: number) {
   const chargeInfo = await prisma.chargeinfo.findUnique({
@@ -231,4 +231,36 @@ export async function processTrade(
 
   await countAuction(user_id);
   await countBlock(user_id, is_sell);
+}
+
+export async function settleTrade(
+  user_id: number,
+  price: number,
+  amount: number,
+  is_sell: boolean,
+) {
+  let sellerBill = await prisma.bill.create({
+    data: {
+      user_id,
+      is_sell,
+      total_amount: amount,
+      left_amount: amount,
+      price,
+      is_settled: false,
+    },
+  });
+
+  let { profit, commition } = await makeDeals(sellerBill);
+
+  if (commition > 0) {
+    await prisma.commition.create({
+      data: {
+        user_id,
+        amount: commition,
+      },
+    });
+  }
+
+  let charge = profit + commition;
+  await addCharge(user_id, charge);
 }

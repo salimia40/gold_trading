@@ -12,7 +12,7 @@ import {
   matchTolerance,
   maxCanTrade,
   processTrade,
-} from "./utils";
+} from "../../services/trade";
 
 export const OfferPayload = objectType({
   name: "OfferPayload",
