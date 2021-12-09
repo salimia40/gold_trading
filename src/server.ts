@@ -1,5 +1,5 @@
 import { ApolloServer } from "apollo-server-express";
-
+import * as Http from "http";
 import { createContext } from "./schema/context";
 import { schema } from "./schema";
 
@@ -12,16 +12,15 @@ const server = new ApolloServer({
   context: createContext,
 });
 
-const startServer = (async () => {
-  await server.start();
-  server.applyMiddleware({ app, cors: false });
-});
+server.start();
+server.applyMiddleware({ app, cors: false });
 
-startServer().then(() => {
-  const PORT = 5050;
-  app.listen({ port: PORT }, () => {
-    console.log(
-      `🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`,
-    );
-  });
+const httpServer = Http.createServer(app);
+server.installSubscriptionHandlers(httpServer);
+
+httpServer.listen({ port: 4000 }, () => {
+  console.log(`server at http://localhost:4000${server.graphqlPath}`);
+  console.log(
+    `Subscriptions server at ws://localhost:4000${server.subscriptionsPath}`,
+  );
 });

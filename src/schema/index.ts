@@ -30,6 +30,7 @@ import { permissions } from "./permissions";
 
 import { AuthMutations } from "./authentication";
 import { Upload } from "./upload";
+import path from "path";
 
 export const DateTime = asNexusMethod(DateTimeResolver, "date");
 
@@ -64,6 +65,7 @@ const ActionResult = objectType({
 });
 
 const schemaWithoutPermissions = makeSchema({
+  shouldExitAfterGenerateArtifacts: true,
   types: [
     DateTime,
     SortOrder,
@@ -88,6 +90,7 @@ const schemaWithoutPermissions = makeSchema({
   ],
   outputs: {
     typegen: __dirname + "/generated/nexus.ts",
+    schema: path.join(__dirname, "../../graphql.schema"),
   },
   contextType: {
     module: require.resolve("./context"),
