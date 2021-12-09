@@ -65,7 +65,7 @@ const ActionResult = objectType({
 });
 
 const schemaWithoutPermissions = makeSchema({
-  shouldExitAfterGenerateArtifacts: true,
+  // shouldExitAfterGenerateArtifacts: true,
   types: [
     DateTime,
     SortOrder,
