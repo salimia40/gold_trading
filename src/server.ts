@@ -8,7 +8,7 @@ import "./services/storage";
 
 import app from "./express";
 
-const httpServer = Http.createServer(app);
+export const httpServer = Http.createServer(app);
 
 const subscriptionServer = SubscriptionServer.create({
   // This is the `schema` we just created.
@@ -38,7 +38,7 @@ const server = new ApolloServer({
   }],
 });
 
-const start = async () => {
+export const start = async () => {
   await server.start();
   server.applyMiddleware({ app, cors: false });
 };
