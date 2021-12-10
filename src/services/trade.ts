@@ -6,6 +6,7 @@ import { Decimal } from "@prisma/client/runtime";
 import { countAuction } from "./auction";
 import { countBlock } from "./block";
 import { userCommition } from "./user";
+import { pubsub } from "./pubsub";
 
 export async function hasSufficentCharge(user_id: number) {
   const chargeInfo = await prisma.chargeinfo.findUnique({
@@ -95,8 +96,8 @@ export async function autoExpire(offer_id: number) {
   const expire = (await setting.get("OFFER_EXPIRE")) as boolean;
   if (expire) {
     const age = (await setting.get("OFFER_AGE")) as number;
-    setTimeout(() => {
-      prisma.offer.update({
+    setTimeout(async () => {
+      let offer = await prisma.offer.update({
         where: {
           id: offer_id,
         },
@@ -104,6 +105,7 @@ export async function autoExpire(offer_id: number) {
           is_expired: true,
         },
       });
+      pubsub.publish("offer", offer);
     }, age * 1000);
   }
 }

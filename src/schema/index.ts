@@ -13,11 +13,14 @@ import nullGuard from "./plugins/nullguard";
 
 import * as userQueries from "./user/userQueries";
 import * as userMutations from "./user/userMutations";
+import * as userSubscriptions from "./user/userSubscriptions";
 import * as transactionMutations from "./transaction/transactionMutations";
 import * as transactionQueries from "./transaction/transactionQueries";
 import * as settingQueries from "./setting/settingQueries";
 import * as settingMutations from "./setting/settingMutations";
+import * as settingSubscriptions from "./setting/settingSubscriptions";
 import * as tradingMutations from "./trading/tradingMutations";
+import * as tradingSubscriptions from "./trading/tradingSubscriptions";
 import * as tradingQueries from "./trading/tradingQueries";
 import * as blockMutations from "./block/blockMutations";
 import * as blockQueries from "./block/blockQueries";
@@ -76,13 +79,16 @@ const schemaWithoutPermissions = makeSchema({
     AuthMutations,
     userQueries,
     userMutations,
+    userSubscriptions,
     transactionMutations,
     transactionQueries,
     Upload,
     settingQueries,
     settingMutations,
+    settingSubscriptions,
     tradingMutations,
     tradingQueries,
+    tradingSubscriptions,
     blockMutations,
     blockQueries,
     settleMutations,

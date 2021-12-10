@@ -4,11 +4,9 @@ todos:
         [x] automaticaly check auction on price change @done
         [x] check for auction after each trade @done
     subscriptions:
-        [ ] new users
-        [ ] offers
-        [ ] transactions
-        [ ] settings
-        [ ] user trades and deals
+        [x] new users
+        [x] offers
+        [x] settings
     management:
         [x] settle
         [x] block
@@ -19,4 +17,8 @@ todos:
         [ ] email service
         [ ] eamil confirmation
         [ ] password recovery
+    refoctor:
+        [ ] models match prisma typings
+        [ ] types all be named payload
+
     

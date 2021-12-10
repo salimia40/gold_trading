@@ -292,6 +292,12 @@ enum SortOrder {
   desc
 }
 
+type Subscription {
+  newUsers: User
+  offer: Offer
+  settings: Settings
+}
+
 type Transaction {
   created_at: DateTime!
   id: Int!

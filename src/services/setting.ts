@@ -1,5 +1,6 @@
 import { createClient } from "redis";
 import { priceEvent } from "./auction";
+import { pubsub } from "./pubsub";
 
 type Setting = number | string | boolean | null;
 
@@ -132,6 +133,7 @@ class Settings {
     if (setting == "QUOTATION") {
       priceEvent.next(value as number);
     }
+    pubsub.publish("settings", await this.getAll());
   }
 }
 

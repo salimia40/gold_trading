@@ -70,6 +70,8 @@ export const makeOffer = mutationField("makeOffer", {
       },
     });
 
+    context.pubsub.publish("offer", offer);
+
     autoExpire(offer.id);
 
     return { success: true, offer };
@@ -90,6 +92,7 @@ export const cancelOffer = mutationField("cancelOffer", {
         is_expired: true,
       },
     });
+    context.pubsub.publish("offer", offer);
     return { success: true, offer };
   },
 });
@@ -116,7 +119,7 @@ export const trade = mutationField("trade", {
       };
     }
 
-    const offer = await context.prisma.offer.findUnique({
+    let offer = await context.prisma.offer.findUnique({
       where: { id: offer_id },
     });
 
@@ -141,12 +144,14 @@ export const trade = mutationField("trade", {
 
     let price = offer?.price!;
 
-    await context.prisma.offer.update({
+    offer = await context.prisma.offer.update({
       where: { id: offer_id },
       data: {
         left_amount: { decrement: amount },
       },
     });
+
+    context.pubsub.publish("offer", offer);
 
     let seller_id = offer?.is_sell ? offer.user_id : user_id;
     let buyer_id = offer?.is_sell ? user_id : offer?.user_id!;

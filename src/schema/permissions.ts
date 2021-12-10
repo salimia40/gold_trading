@@ -53,4 +53,7 @@ export const permissions = shield({
       or(rules.isAdmin, rules.isOwner),
     ),
   },
+  Subscription: {
+    newUsers: rules.isAuthenticatedUser,
+  },
 });

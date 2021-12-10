@@ -3,6 +3,7 @@ import { prisma } from "./db";
 import { nanoid } from "nanoid";
 import { compare, hash } from "bcryptjs";
 import setting from "./setting";
+import { User } from "@prisma/client";
 
 export async function userExists(email: string, username: string) {
   var user = await prisma.user.findUnique({ where: { email } });

@@ -63,6 +63,7 @@ export const signupMutation = mutationField(
       );
 
       context.login(user);
+      context.pubsub.publish("newUsers", user);
 
       return {
         success: true,
