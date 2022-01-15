@@ -1,6 +1,5 @@
 import { createClient } from "redis";
-import { priceEvent } from "./auction";
-import { pubsub } from "./pubsub";
+import { emmiter } from "./events";
 
 type Setting = number | string | boolean | null;
 
@@ -131,9 +130,8 @@ class Settings {
   public async set(setting: SETTINGS, value: Setting) {
     await this.redisClient.set(setting, String(value));
     if (setting == "QUOTATION") {
-      priceEvent.next(value as number);
+      emmiter.emit("newPrice", value )
     }
-    pubsub.publish("settings", await this.getAll());
   }
 }
 

@@ -28,6 +28,10 @@ export function publishToPublic(channel: string, title: string, body: string) {
   });
 }
 
+export function logout(user_id: number) {
+  beamsClient.deleteUser(user_id.toString())
+}
+
 export function beamsAuth(req: Request, res: Response) {
   // Do your normal auth checks here 🔒
   //   @ts-ignore

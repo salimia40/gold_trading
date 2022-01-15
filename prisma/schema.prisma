@@ -198,6 +198,7 @@ model Transaction {
   transaction_type Transaction_transaction_type
   is_confirmed     Boolean                      @default(false)
   is_done          Boolean                      @default(false)
+  is_declined      Boolean                      @default(false)
   user_id          Int
   created_at       DateTime                     @default(now()) @db.DateTime(0)
   updated_at       DateTime                     @default(now()) @db.DateTime(0)
@@ -210,9 +211,9 @@ model Transaction {
 
 model User {
   id             Int            @id @default(autoincrement())
-  username       String         @unique @db.VarChar(255)
+  username       String?        @unique @db.VarChar(255)
   email          String         @unique @db.VarChar(255)
-  password       String         @db.VarChar(255)
+  password       String?        @db.VarChar(255)
   role           User_role      @default(member)
   name           String?        @db.VarChar(255)
   phone          String?        @db.VarChar(255)
@@ -221,6 +222,7 @@ model User {
   refer_id       String         @unique(map: "refer_id") @db.VarChar(255)
   accepted_terms Boolean        @default(false)
   verified       Boolean        @default(false)
+  registered     Boolean        @default(false)
   created_at     DateTime       @default(now()) @db.DateTime(0)
   updated_at     DateTime       @default(now()) @db.DateTime(0)
   auction        Auction?
@@ -235,6 +237,27 @@ model User {
   refers         Refer[]
   settleresults  Settleresult[]
   transactions   Transaction[]
+  tokens         Token[]
+}
+
+model Token {
+  id         Int       @id @default(autoincrement())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  type       TokenType
+  emailToken String?   @unique // Only used for short lived email tokens
+  valid      Boolean   @default(true)
+  expiration DateTime
+
+  // Relation fields
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+enum TokenType {
+  EMAIL // used as a short-lived token sent to the user's email
+  API
+  REFRESH
 }
 
 model Session {

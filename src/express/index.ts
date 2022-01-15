@@ -1,18 +1,33 @@
-import { sessionMiddleware } from "./session";
-import passport from "passport";
-
-export const passportMiddleware = passport.initialize();
-export const passportSessionMiddleware = passport.session();
-
 import express from "express";
-import { beamsAuth } from "../services/pushNotifications";
+import bodyparser from "body-parser";
+import boom from "express-boom";
+import authRouter, {
+  AdminOnly,
+  authenticateJWT,
+  verifiedOnly,
+} from "./routes/auth";
+import userRouter from "./routes/users";
+import meRouter from "./routes/me";
+import tradeRouter from "./routes/trade";
+import fileUpload from "express-fileupload";
 
 const app = express();
 
-app.use(sessionMiddleware);
-app.use(passportMiddleware);
-app.use(passportSessionMiddleware);
+app.use(bodyparser.json());
+app.use(boom());
+app.use(
+  fileUpload({
+    limits: { fileSize: 5 * 1024 * 1024 },
+  })
+);
 
-app.get("/pusher/beams-auth", beamsAuth);
+app.use("/auth", authRouter);
+app.use("/users", authenticateJWT, verifiedOnly, AdminOnly, userRouter);
+app.use("/me", authenticateJWT, verifiedOnly, meRouter);
+app.use("/trade", authenticateJWT, verifiedOnly, tradeRouter);
+
+app.get("/", authenticateJWT, (req, res) => {
+  res.send(req.user);
+});
 
 export default app;
