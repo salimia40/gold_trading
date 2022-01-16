@@ -29,13 +29,13 @@ export function publishToPublic(channel: string, title: string, body: string) {
 }
 
 export function logout(user_id: number) {
-  beamsClient.deleteUser(user_id.toString())
+  beamsClient.deleteUser(user_id.toString());
 }
 
 export function beamsAuth(req: Request, res: Response) {
   // Do your normal auth checks here 🔒
   //   @ts-ignore
-  const userId = req.user?.id; // get it from your auth system
+  const userId = req.user?.id!.toString()!; // get it from your auth system
   const userIDInQueryParam = req.query["user_id"];
   if (userId != userIDInQueryParam) {
     res.status(401).send("Inconsistent request");

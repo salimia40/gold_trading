@@ -5,6 +5,7 @@ import { prisma } from "../../services/db";
 import { sendMail } from "../../services/mail";
 import { createUser, userExists } from "../../services/user";
 import jwt from "jsonwebtoken";
+import { beamsAuth } from "../../services/pushNotifications";
 
 const EMAIL_TOKEN_EXPIRATION_MINUTES = 10;
 export const API_AUTH_STATEGY = "API";
@@ -40,6 +41,12 @@ function generateAuthToken(tokenId: number): string {
     noTimestamp: true,
   });
 }
+
+export const decriptToken = (token: string) => {
+  return jwt.verify(token, JWT_SECRET, {
+    algorithms: [JWT_ALGORITHM],
+  }) as APITokenPayload;
+};
 
 const login: RequestHandler = async (req, res) => {
   const { email } = req.body;
@@ -271,9 +278,7 @@ export const authenticateJWT: RequestHandler = async (req, res, next) => {
   const authHeader = req.headers.authorization;
   try {
     if (authHeader) {
-      const { tokenId } = jwt.verify(authHeader, JWT_SECRET, {
-        algorithms: [JWT_ALGORITHM],
-      }) as APITokenPayload;
+      const { tokenId } = decriptToken(authHeader);
 
       const fetchedToken = await prisma.token.findUnique({
         where: {
@@ -286,12 +291,12 @@ export const authenticateJWT: RequestHandler = async (req, res, next) => {
 
       // Check if token could be found in database and is valid
       if (!fetchedToken || !fetchedToken?.valid) {
-        return { isValid: false, errorMessage: "Invalid Token" };
+        return res.boom.unauthorized("Invalid Token");
       }
 
       // Check token expiration
       if (fetchedToken.expiration < new Date()) {
-        return { isValid: false, errorMessage: "Token expired" };
+        return res.boom.unauthorized("Token expired");
       }
 
       // The token is valid. Make the `userId`, `isAdmin`, and `teacherOf` to `credentials` which is available in route handlers via `request.auth.credentials`
@@ -332,5 +337,5 @@ router.post("/login", login);
 router.post("/authenticate", authenticate);
 router.post("/register", register);
 router.get("/token", authenticateJWT, refresh);
-
+router.get("/beams", authenticateJWT, beamsAuth);
 export default router;

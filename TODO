@@ -13,12 +13,8 @@ todos:
         [ ] commition queries // from last settle / ever / user / day
     planning:
         [x] notification service using pusher 
-        [ ] support service using chatwood
-        [ ] email service
-        [ ] eamil confirmation
-        [ ] password recovery
-    refoctor:
-        [ ] models match prisma typings
-        [ ] types all be named payload
+        [x] support service using chatwood
+        [x] email service
+        [x] eamil confirmation
 
     

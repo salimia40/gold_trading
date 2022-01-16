@@ -10,6 +10,9 @@ import userRouter from "./routes/users";
 import meRouter from "./routes/me";
 import tradeRouter from "./routes/trade";
 import fileUpload from "express-fileupload";
+import { createServer } from "http";
+import createSocket from "./socket";
+import { sockethHandler } from "../services/events";
 
 const app = express();
 
@@ -30,4 +33,7 @@ app.get("/", authenticateJWT, (req, res) => {
   res.send(req.user);
 });
 
-export default app;
+const httpServer = createServer(app);
+const io = createSocket(httpServer);
+sockethHandler(io);
+export default httpServer;
