@@ -9,8 +9,8 @@ datasource db {
 
 model Auction {
   id           Int      @id @default(autoincrement())
-  margin       Int?
-  price        Int?
+  margin       Decimal?
+  price        Decimal?
   is_triggered Boolean  @default(false)
   is_sell      Boolean  @default(false)
   user_id      Int      @unique
@@ -25,11 +25,12 @@ model Bill {
   id           Int      @id @default(autoincrement())
   seller_id    Int?
   buyer_id     Int?
-  price        Int?
+  price        Decimal?
   total_amount Int?
   left_amount  Int?
   is_sell      Boolean
   is_settled   Boolean
+  settle_id    Int?
   user_id      Int
   created_at   DateTime @default(now()) @db.DateTime(0)
   updated_at   DateTime @default(now()) @db.DateTime(0)
@@ -47,7 +48,7 @@ model Blockoperation {
 
 model Blockresult {
   id             Int            @id @default(autoincrement())
-  commition      Decimal?       @db.Decimal(8, 2)
+  commition      Decimal?       @db.Decimal(18, 2)
   user_id        Int
   operation_id   Int
   created_at     DateTime       @default(now()) @db.DateTime(0)
@@ -73,9 +74,9 @@ model Block {
 
 model Chargeinfo {
   id          Int      @id @default(autoincrement())
-  charge      Decimal  @default(0.00) @db.Decimal(8, 2)
-  base_charge Decimal  @default(0.00) @db.Decimal(8, 2)
-  vip_off     Decimal  @default(0.00) @db.Decimal(8, 2)
+  charge      Decimal  @default(0.00) @db.Decimal(18, 2)
+  base_charge Decimal  @default(0.00) @db.Decimal(18, 2)
+  vip_off     Decimal  @default(0.00) @db.Decimal(18, 2)
   user_id     Int      @unique
   created_at  DateTime @default(now()) @db.DateTime(0)
   updated_at  DateTime @default(now()) @db.DateTime(0)
@@ -89,19 +90,21 @@ model Commition {
   user_id    Int
   amount     Decimal? @db.Decimal(8, 2)
   is_settled Boolean  @default(false)
+  settle_id  Int?
   created_at DateTime @default(now()) @db.DateTime(0)
   updated_at DateTime @default(now()) @db.DateTime(0)
 }
 
 model Deal {
   id         Int            @id @default(autoincrement())
-  buy_price  Decimal?       @db.Decimal(8, 2)
-  sell_price Decimal?       @db.Decimal(8, 2)
+  buy_price  Decimal?       @db.Decimal(18, 2)
+  sell_price Decimal?       @db.Decimal(18, 2)
   amount     Int?
-  profit     Decimal?       @db.Decimal(8, 2)
-  commition  Decimal?       @db.Decimal(8, 2)
+  profit     Decimal?       @db.Decimal(18, 2)
+  commition  Decimal?       @db.Decimal(18, 2)
   is_sell    Boolean
   is_settled Boolean        @default(false)
+  settle_id  Int?
   condition  Deal_condition @default(normal)
   user_id    Int
   created_at DateTime       @default(now()) @db.DateTime(0)
@@ -127,8 +130,8 @@ model Document {
 model Gift {
   id         Int      @id @default(autoincrement())
   activated  Boolean  @default(false)
-  charge     Decimal  @db.Decimal(8, 2)
-  trigger    Decimal  @db.Decimal(8, 2)
+  charge     Decimal  @db.Decimal(18, 2)
+  trigger    Decimal  @db.Decimal(18, 2)
   user_id    Int
   created_at DateTime @default(now()) @db.DateTime(0)
   updated_at DateTime @default(now()) @db.DateTime(0)
@@ -140,7 +143,7 @@ model Gift {
 model Offer {
   id           Int             @id @default(autoincrement())
   condition    Offer_condition @default(normal)
-  price        Int?
+  price        Decimal?
   total_amount Int?
   left_amount  Int?
   is_sell      Boolean
@@ -166,8 +169,8 @@ model Refer {
 
 model Settleresult {
   id         Int      @id @default(autoincrement())
-  profit     Decimal? @db.Decimal(8, 2)
-  commition  Decimal? @db.Decimal(8, 2)
+  profit     Decimal? @db.Decimal(18, 2)
+  commition  Decimal? @db.Decimal(18, 2)
   user_id    Int
   settle_id  Int
   created_at DateTime @default(now()) @db.DateTime(0)
@@ -181,7 +184,7 @@ model Settleresult {
 
 model Settle {
   id            Int            @id @default(autoincrement())
-  price         Decimal        @db.Decimal(8, 2)
+  price         Decimal        @db.Decimal(18, 2)
   operator_id   Int
   created_at    DateTime       @default(now()) @db.DateTime(0)
   updated_at    DateTime       @default(now()) @db.DateTime(0)
@@ -191,7 +194,7 @@ model Settle {
 model Transaction {
   id               Int                          @id @default(autoincrement())
   operator_id      Int?
-  amount           Int?
+  amount           Decimal?
   amount_text      String?                      @db.VarChar(255)
   document_id      Int?                         @unique
   description      String?                      @db.VarChar(255)
@@ -252,6 +255,21 @@ model Token {
   // Relation fields
   user   User @relation(fields: [userId], references: [id])
   userId Int
+}
+
+model Price {
+  id         Int      @id @default(autoincrement())
+  value      Int
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @default(now()) @db.DateTime(0)
+}
+
+model Notification {
+  id         Int      @id @default(autoincrement())
+  message    String
+  is_seen    Boolean  @default(false)
+  created_at DateTime @default(now()) @db.DateTime(0)
+  updated_at DateTime @default(now()) @db.DateTime(0)
 }
 
 enum TokenType {

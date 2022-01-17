@@ -1,6 +1,5 @@
 import { prisma } from "./db";
 import { nanoid } from "nanoid";
-import { hash } from "bcryptjs";
 import setting from "./setting";
 import {
   Prisma,

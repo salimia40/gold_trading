@@ -23,9 +23,13 @@ export async function countAuction(user_id: number) {
 
   console.info(bills);
 
-  let amount = await reduce(bills, (acc, bill) => {
-    return bill.is_sell ? acc + bill.left_amount! : acc - bill.left_amount!;
-  }, 0);
+  let amount = await reduce(
+    bills,
+    (acc, bill) => {
+      return bill.is_sell ? acc + bill.left_amount! : acc - bill.left_amount!;
+    },
+    0
+  );
   console.info(amount);
 
   let is_sell = amount > 0;
@@ -40,7 +44,7 @@ export async function countAuction(user_id: number) {
   let value = 0;
   await forEach(filteredBills, (bill) => {
     amount += bill.left_amount!;
-    value += bill.left_amount! * bill.price!;
+    value += bill.price?.times(bill.left_amount!)!.toNumber()!;
   });
   console.info(amount, value);
 
@@ -91,13 +95,12 @@ export async function countAuction(user_id: number) {
     console.error(error);
   }
 
-  //   TODO check for auction
   await checkAuction(user_id);
 }
 
 export const priceEvent = new Subject<number>();
 
-emmiter.on("newPrice" , (price: number) =>{
+emmiter.on("newPrice", (price: number) => {
   var min = price - 10;
   var max = price + 10;
 
@@ -106,29 +109,30 @@ emmiter.on("newPrice" , (price: number) =>{
       (auctions) =>
         R.filter(
           (auction: Auction) =>
-            !auction?.is_triggered && auction.margin != 0 &&
-            auction.price != 0,
-          auctions,
+            !auction?.is_triggered &&
+            auction.margin?.toNumber() != 0 &&
+            auction.price?.toNumber() != 0,
+          auctions
         ),
       (auctions) =>
         R.filter(
           (auction: Auction) =>
-            (auction.is_sell && auction?.margin! <= max) ||
-            (!auction.is_sell && auction?.margin! >= min),
-          auctions,
+            (auction.is_sell && auction?.margin?.toNumber()! <= max) ||
+            (!auction.is_sell && auction?.margin?.toNumber()! >= min),
+          auctions
         ),
       (auctions) => {
-        forEach(auctions,( auction) => {
-          emmiter.emit("auctionMargin" , auction)
-        } )
+        forEach(auctions, (auction) => {
+          emmiter.emit("auctionMargin", auction);
+        });
         return auctions;
       },
       (auctions) =>
         R.filter(
           (auction: Auction) =>
-            (auction.is_sell && auction?.margin! <= price) ||
-            (!auction.is_sell && auction?.margin! >= price),
-          auctions,
+            (auction.is_sell && auction?.margin!.toNumber()! <= price) ||
+            (!auction.is_sell && auction?.margin!.toNumber()! >= price),
+          auctions
         ),
       (auctions) =>
         forEach(auctions, async (auction) => {
@@ -140,11 +144,14 @@ emmiter.on("newPrice" , (price: number) =>{
               left_amount: { gt: 0 },
             },
           });
-          let amount = await reduce(bills, (acc, bill) =>
-            acc + bill.left_amount!, 0);
+          let amount = await reduce(
+            bills,
+            (acc, bill) => acc + bill.left_amount!,
+            0
+          );
 
           if (amount > 0) {
-            emmiter.emit("autionHit", auction)
+            emmiter.emit("autionHit", auction);
 
             await prisma.offer.create({
               data: {
@@ -167,10 +174,10 @@ emmiter.on("newPrice" , (price: number) =>{
               },
             });
           }
-        }),
-    ),
+        })
+    )
   );
-},)
+});
 
 async function checkAuction(user_id: number) {
   const auction = await prisma.auction.findUnique({ where: { user_id } });
@@ -178,14 +185,14 @@ async function checkAuction(user_id: number) {
   var min = price - 10;
   var max = price + 10;
   if (
-    (auction?.is_sell && auction?.margin! <= max) ||
-    (!auction?.is_sell && auction?.margin! >= min)
+    (auction?.is_sell && auction?.margin!.toNumber()! <= max) ||
+    (!auction?.is_sell && auction?.margin!.toNumber()! >= min)
   ) {
     // TODO alarm user
   }
   if (
-    (auction?.is_sell && auction?.margin! <= price) ||
-    (!auction?.is_sell && auction?.margin! >= price)
+    (auction?.is_sell && auction?.margin!.toNumber()! <= price) ||
+    (!auction?.is_sell && auction?.margin!.toNumber()! >= price)
   ) {
     let bills = await prisma.bill.findMany({
       where: {

@@ -104,6 +104,7 @@ const myBills: RequestHandler = async (req, res) => {
   try {
     let result = await getBills(
       req.user?.id!,
+      req.body.settle_id,
       req.body.is_sell,
       req.body.is_settled,
       req.body.is_open,
@@ -122,6 +123,7 @@ const myDeals: RequestHandler = async (req, res) => {
   try {
     let result = await getDeals(
       req.user?.id!,
+      req.body.settle_id,
       req.body.is_sell,
       req.body.is_settled,
       req.body.sort,

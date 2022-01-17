@@ -9,7 +9,7 @@ import {
   makeOffer,
   trade,
 } from "../../services/trade";
-import { AdminOnly, verifiedOnly } from "./auth";
+import { AdminOnly } from "./auth";
 
 const block: RequestHandler = async (req, res) => {
   try {
@@ -138,6 +138,7 @@ const bills: RequestHandler = async (req, res) => {
   try {
     let result = await getBills(
       req.body.userId,
+      req.body.settle_id,
       req.body.is_sell,
       req.body.is_settled,
       req.body.is_open,
@@ -156,6 +157,7 @@ const deals: RequestHandler = async (req, res) => {
   try {
     let result = await getDeals(
       req.body.userId,
+      req.body.settle_id,
       req.body.is_sell,
       req.body.is_settled,
       req.body.sort,

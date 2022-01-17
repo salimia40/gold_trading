@@ -140,7 +140,7 @@ async function makeDeals(bill: Bill) {
 
     let sell_price = is_sell ? price : _bill.price!;
     let buy_price = is_sell ? _bill.price! : price;
-    let _priceDiff = sell_price - buy_price;
+    let _priceDiff = sell_price.minus(buy_price).toNumber();
     let _profit = (_priceDiff * sold * 100) / 4.3318;
     let _commition = sold * commitionFee;
 
@@ -337,6 +337,7 @@ export async function getOffers(
 
 export async function getBills(
   user_id: number | null = null,
+  settle_id: number | null = null,
   is_sell: boolean | null = null,
   is_settled: boolean | null = null,
   is_open: boolean | null = null,
@@ -353,6 +354,10 @@ export async function getBills(
   if (user_id != null) {
     query.where.user_id = user_id;
     cQuery.where.user_id = user_id;
+  }
+  if (settle_id != null) {
+    query.where.settle_id = settle_id;
+    cQuery.where.settle_id = settle_id;
   }
   if (is_sell != null) {
     query.where.is_sell = is_sell;
@@ -403,6 +408,7 @@ export async function getBills(
 
 export async function getDeals(
   user_id: number | null = null,
+  settle_id: number | null = null,
   is_sell: boolean | null = null,
   is_settled: boolean | null = null,
   sort: "asc" | "desc" = "asc",
@@ -418,6 +424,10 @@ export async function getDeals(
   if (user_id != null) {
     query.where.user_id = user_id;
     cQuery.where.user_id = user_id;
+  }
+  if (settle_id != null) {
+    query.where.settle_id = settle_id;
+    cQuery.where.settle_id = settle_id;
   }
   if (is_sell != null) {
     query.where.is_sell = is_sell;
@@ -556,6 +566,6 @@ export async function trade(user_id: number, amount: number, offer_id: number) {
 
   console.info(seller_id, buyer_id, price, amount);
 
-  await processTrade(seller_id, buyer_id, price, amount, true);
-  await processTrade(seller_id, buyer_id, price, amount, false);
+  await processTrade(seller_id, buyer_id, price.toNumber(), amount, true);
+  await processTrade(seller_id, buyer_id, price.toNumber(), amount, false);
 }

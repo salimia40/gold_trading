@@ -50,6 +50,7 @@ export async function getSettles(
 
 export async function getSettleResults(
   user_id: number | null,
+  settle_id: number | null,
   sort: "asc" | "desc" = "asc",
   paginate: boolean = false,
   page: number = 1,
@@ -63,6 +64,11 @@ export async function getSettleResults(
   if (user_id != null) {
     query.where.user_id = user_id;
     countQ.where.user_id = user_id;
+  }
+
+  if (settle_id != null) {
+    query.where.settle_id = settle_id;
+    countQ.where.settle_id = settle_id;
   }
 
   if (sort != null) {
@@ -169,6 +175,7 @@ export async function doSettle(operator_id: number, price: number) {
     },
     data: {
       is_settled: true,
+      settle_id: settle.id,
     },
   });
 
@@ -178,6 +185,7 @@ export async function doSettle(operator_id: number, price: number) {
     },
     data: {
       is_settled: true,
+      settle_id: settle.id,
     },
   });
 
@@ -187,6 +195,7 @@ export async function doSettle(operator_id: number, price: number) {
     },
     data: {
       is_settled: true,
+      settle_id: settle.id,
     },
   });
 }
