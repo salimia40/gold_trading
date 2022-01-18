@@ -525,6 +525,40 @@ export async function getCommitions(
   };
 }
 
+export async function getPrices(
+  paginate: boolean = false,
+  page: number = 1,
+  perPage: number = 10
+) {
+  let query: Prisma.PriceFindManyArgs = {};
+  let cQuery: Prisma.PriceCountArgs = {};
+  query.where = {};
+  cQuery.where = {};
+
+  let totalPage: number = 1,
+    total: number;
+  total = await prisma.price.count(cQuery);
+  if (paginate) {
+    perPage = perPage || 10;
+    totalPage = Math.ceil(total / perPage);
+    if (page > totalPage) {
+      page = 1;
+    }
+    query.skip = (page - 1) * perPage;
+    query.take = perPage;
+  }
+
+  let prices = await prisma.price.findMany(query);
+
+  return {
+    items: prices,
+    page,
+    total,
+    totalPage,
+    perPage,
+  };
+}
+
 export async function makeOffer(
   user_id: number,
   amount: number,

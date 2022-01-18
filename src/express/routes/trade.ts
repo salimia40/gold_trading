@@ -188,6 +188,23 @@ const commitions: RequestHandler = async (req, res) => {
   }
 };
 
+const prices: RequestHandler = async (req, res) => {
+  try {
+    let result = await getCommitions(
+      req.body.userId,
+      req.body.settle_id,
+      req.body.is_settled,
+      req.body.sort,
+      req.body.paginate,
+      req.body.page,
+      req.body.perPage
+    );
+    return res.send(result);
+  } catch (error: any) {
+    res.boom.badRequest(error.message);
+  }
+};
+
 const router = Router();
 
 router.post("/offers", AdminOnly, offers);
@@ -200,6 +217,7 @@ router.post("/blocks", AdminOnly, blocks);
 router.post("/blockresults", AdminOnly, blockresults);
 router.post("/settle", AdminOnly, settle);
 router.post("/block", AdminOnly, block);
+router.post("/prices", prices);
 router.post("/cancel", cancel);
 router.post("/offer", offer);
 router.post("/trade", doTrade);
