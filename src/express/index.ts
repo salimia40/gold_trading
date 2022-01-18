@@ -9,6 +9,7 @@ import authRouter, {
 import userRouter from "./routes/users";
 import meRouter from "./routes/me";
 import tradeRouter from "./routes/trade";
+import settingRouter from "./routes/setting";
 import fileUpload from "express-fileupload";
 import { createServer } from "http";
 import createSocket from "./socket";
@@ -28,6 +29,7 @@ app.use("/auth", authRouter);
 app.use("/users", authenticateJWT, verifiedOnly, AdminOnly, userRouter);
 app.use("/me", authenticateJWT, verifiedOnly, meRouter);
 app.use("/trade", authenticateJWT, verifiedOnly, tradeRouter);
+app.use("/setting", authenticateJWT, verifiedOnly, settingRouter);
 
 app.get("/", authenticateJWT, (req, res) => {
   res.send(req.user);

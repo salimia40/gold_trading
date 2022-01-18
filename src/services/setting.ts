@@ -7,8 +7,6 @@ type Setting = number | string | boolean | null;
 type SETTINGS =
   | "BASE_CHARGE"
   | "VIP_OFF"
-  | "GIFT_ON_SIGNUP"
-  | "GIFT_ON_FIRSTCHARGE"
   | "TARADING_ACTIVATED"
   | "QUOTATION"
   | "TOLERENCE"
@@ -20,8 +18,6 @@ type SETTINGS =
 const settingItems: SETTINGS[] = [
   "BASE_CHARGE",
   "VIP_OFF",
-  "GIFT_ON_SIGNUP",
-  "GIFT_ON_FIRSTCHARGE",
   "TARADING_ACTIVATED",
   "QUOTATION",
   "TOLERENCE",

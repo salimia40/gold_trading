@@ -8,9 +8,7 @@ import {
 } from "@prisma/client";
 import { emmiter } from "./events";
 import { get, put } from "./storage";
-import { Readable } from "stream";
 import sharp from "sharp";
-import { stopCoverage } from "v8";
 
 export async function userExists(email: string, username: string | undefined) {
   var user = await prisma.user.findUnique({ where: { email } });
