@@ -2,9 +2,9 @@ import { createClient } from "redis";
 import { prisma } from "./db";
 import { emmiter } from "./events";
 
-type Setting = number | string | boolean | null;
+export type Setting = number | string | boolean | null;
 
-type SETTINGS =
+export type SETTINGS =
   | "BASE_CHARGE"
   | "VIP_OFF"
   | "TARADING_ACTIVATED"

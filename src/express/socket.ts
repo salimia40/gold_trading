@@ -55,6 +55,7 @@ const createSocket = (httpServer: HttpServer) => {
     socket.join(`/charge/${userId}`);
     socket.join(`/settle/${userId}`);
     socket.join(`/block/${userId}`);
+    socket.join(`/notification/${userId}`);
 
     next();
   });

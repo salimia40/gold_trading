@@ -2,6 +2,7 @@ import {
   Auction,
   Blockresult,
   Chargeinfo,
+  Notification,
   Offer,
   Settleresult,
   Transaction,
@@ -9,6 +10,8 @@ import {
 } from "@prisma/client";
 import EventEmitter from "events";
 import { Server } from "socket.io";
+import { notifyAdmins, notifyAll, notifyUser } from "./notification";
+import { Setting, SETTINGS } from "./setting";
 
 export const emmiter = new EventEmitter();
 
@@ -25,6 +28,7 @@ export const emmiter = new EventEmitter();
  *      settle          (Settleresult)
  *      block           (Blockresult)
  *      offer           (Offer)
+ *      notification    (Notification)
  *      setting         [setting , value]
  */
 
@@ -53,6 +57,9 @@ export const sockethHandler = (io: Server) => {
   emmiter.on("/newCharge", (item: Chargeinfo) => {
     io.to(`/newCharge/${item.user_id}`).emit("/newCharge", item);
   });
+  emmiter.on("/notification", (item: Notification) => {
+    io.to(`/notification/${item.user_id}`).emit("/notification", item);
+  });
   emmiter.on("/auctionMargin", (item: Auction) => {
     io.to(`/auctionMargin/${item.user_id}`).emit("/auctionMargin", item);
   });
@@ -67,5 +74,45 @@ export const sockethHandler = (io: Server) => {
   });
   emmiter.on("/setting", (item: []) => {
     io.to(`/setting`).emit("/setting", item);
+  });
+};
+
+export const notificationHandler = (io: Server) => {
+  emmiter.on("newUser", (user: User) => {
+    notifyAdmins("A new user has registered", "/users");
+  });
+  emmiter.on("/chargeRequest", (item: Transaction) => {
+    notifyAdmins("A new charge request has been sent", "/transactions");
+  });
+  emmiter.on("/auctionMargin", (item: Auction) => {
+    notifyUser(item.user_id!, "market price has gotten near margin");
+  });
+  emmiter.on("/auctionHit", (item: Auction) => {
+    notifyUser(
+      item.user_id!,
+      "market price has hit your margin. your trades are auctioned"
+    );
+  });
+  emmiter.on("/charge", (item: Transaction) => {
+    notifyUser(
+      item.user_id!,
+      "your transaction has been updated",
+      "/transactions"
+    );
+  });
+  emmiter.on("/settle", (item: Settleresult) => {
+    notifyUser(item.user_id!, "market has been settled", "/settles");
+  });
+  emmiter.on("/block", (item: Blockresult) => {
+    notifyUser(item.user_id!, "daily block has been occured", "/blocks");
+  });
+  emmiter.on("/setting", (item: [SETTINGS, Setting]) => {
+    if (item[0] == "TARADING_ACTIVATED") {
+      if (item[1] as boolean) {
+        notifyAll("trading platform activated", "/");
+      } else {
+        notifyAll("trading platform closed", "/");
+      }
+    }
   });
 };

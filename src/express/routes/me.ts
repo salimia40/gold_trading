@@ -15,6 +15,7 @@ import {
 } from "../../services/user";
 import path from "path";
 import { prisma } from "../../services/db";
+import { getNotifications } from "../../services/notification";
 
 const me: RequestHandler = async (req, res) => {
   const userId = req.user?.id!;
@@ -130,6 +131,20 @@ const myDeals: RequestHandler = async (req, res) => {
       req.body.is_sell,
       req.body.is_settled,
       req.body.sort,
+      req.body.paginate,
+      req.body.page,
+      req.body.perPage
+    );
+    return res.send(result);
+  } catch (error: any) {
+    res.boom.badRequest(error.message);
+  }
+};
+
+const myNotifications: RequestHandler = async (req, res) => {
+  try {
+    let result = await getNotifications(
+      req.user?.id!,
       req.body.paginate,
       req.body.page,
       req.body.perPage
