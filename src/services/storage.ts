@@ -15,7 +15,7 @@ const minioClient = new Client({
 export async function put(
   bucketName: string,
   filename: string,
-  file: Readable,
+  file: Readable | Buffer
 ) {
   const exists = await minioClient.bucketExists(bucketName);
   if (!exists) {
@@ -26,10 +26,7 @@ export async function put(
   console.log(result);
 }
 
-export async function get(
-  bucketName: string,
-  filename: string,
-) {
+export async function get(bucketName: string, filename: string) {
   const result = await minioClient.getObject(bucketName, filename);
   return result;
 }

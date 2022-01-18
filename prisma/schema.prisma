@@ -241,6 +241,7 @@ model User {
   settleresults  Settleresult[]
   transactions   Transaction[]
   tokens         Token[]
+  avatar         Avatar?
 }
 
 model Token {
@@ -255,6 +256,16 @@ model Token {
   // Relation fields
   user   User @relation(fields: [userId], references: [id])
   userId Int
+}
+
+model Avatar {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  file      String
+  // Relation fields
+  user      User     @relation(fields: [user_id], references: [id])
+  user_id   Int      @unique
 }
 
 model Price {

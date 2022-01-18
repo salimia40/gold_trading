@@ -6,12 +6,12 @@ import { UploadedFile } from "express-fileupload";
 import {
   chargeRequest,
   dischargeRequest,
+  getAvatar,
   getTransactions,
   getUser,
+  setAvatar,
 } from "../../services/user";
-import streamifier from "streamifier";
 import path from "path";
-import { verifiedOnly } from "./auth";
 
 const me: RequestHandler = async (req, res) => {
   const userId = req.user?.id!;
@@ -51,7 +51,7 @@ const requestCharge: RequestHandler = async (req, res) => {
       req.user?.id!,
       amount,
       amount_text,
-      streamifier.createReadStream(document.data),
+      document.data,
       path.extname(document.name)
     );
     res.sendStatus(200);
@@ -154,6 +154,30 @@ const myCommitions: RequestHandler = async (req, res) => {
   }
 };
 
+const myAvatar: RequestHandler = async (req, res) => {
+  try {
+    let result = await getAvatar(req.user?.id!);
+    return res.send(result);
+  } catch (error: any) {
+    res.boom.badRequest(error.message);
+  }
+};
+
+const avatarUpload: RequestHandler = async (req, res) => {
+  const avatar = req.files?.avatar! as UploadedFile;
+
+  try {
+    let result = await setAvatar(
+      req.user?.id!,
+      avatar.data,
+      path.extname(avatar.name)
+    );
+    return res.send(result);
+  } catch (error: any) {
+    res.boom.badRequest(error.message);
+  }
+};
+
 const router = Router();
 
 router.post("/", me);
@@ -165,5 +189,7 @@ router.post("/deals", myDeals);
 router.post("/commitions", myCommitions);
 router.post("/blocks", myBlockresults);
 router.post("/settles", mySettleresults);
+router.post("/avatar", myAvatar);
+router.post("/avatar/set", avatarUpload);
 
 export default router;

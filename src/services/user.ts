@@ -7,9 +7,10 @@ import {
   Transaction_transaction_type,
 } from "@prisma/client";
 import { emmiter } from "./events";
-import { ReadStream } from "fs";
-import { put } from "./storage";
+import { get, put } from "./storage";
 import { Readable } from "stream";
+import sharp from "sharp";
+import { stopCoverage } from "v8";
 
 export async function userExists(email: string, username: string | undefined) {
   var user = await prisma.user.findUnique({ where: { email } });
@@ -262,7 +263,7 @@ export async function chargeRequest(
   user_id: number,
   amount: number,
   amount_text: string,
-  document: Readable,
+  document: Buffer,
   ext: string = ".jpg"
 ) {
   let file = nanoid() + ext;
@@ -438,6 +439,10 @@ export async function getTransactions(
     };
   }
 
+  query.include = {
+    document: true,
+  };
+
   let totalPage: number = 1;
   let total = await prisma.transaction.count(countQ);
 
@@ -460,4 +465,26 @@ export async function getTransactions(
     totalPage,
     perPage,
   };
+}
+
+export async function setAvatar(
+  user_id: number,
+  avatar: Buffer,
+  extname: string
+) {
+  let resized = await sharp(avatar).resize(256, 256).toBuffer();
+  let name = nanoid() + extname;
+  await put("avatars", name, resized);
+  await prisma.avatar.create({ data: { user_id, file: name } });
+}
+
+export async function getAvatar(user_id: number) {
+  let avatar = await prisma.avatar.findUnique({ where: { user_id } });
+  let avatarFile = await get("avatars", avatar?.file!);
+  return avatarFile;
+}
+
+export async function getDocument(name: string) {
+  let avatarFile = await get("documents", name);
+  return avatarFile;
 }
