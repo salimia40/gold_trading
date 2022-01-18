@@ -4,6 +4,7 @@ import { doSettle, getSettleResults, getSettles } from "../../services/settle";
 import {
   cancelOffer,
   getBills,
+  getCommitions,
   getDeals,
   getOffers,
   makeOffer,
@@ -170,12 +171,29 @@ const deals: RequestHandler = async (req, res) => {
     res.boom.badRequest(error.message);
   }
 };
+const commitions: RequestHandler = async (req, res) => {
+  try {
+    let result = await getCommitions(
+      req.body.userId,
+      req.body.settle_id,
+      req.body.is_settled,
+      req.body.sort,
+      req.body.paginate,
+      req.body.page,
+      req.body.perPage
+    );
+    return res.send(result);
+  } catch (error: any) {
+    res.boom.badRequest(error.message);
+  }
+};
 
 const router = Router();
 
 router.post("/offers", AdminOnly, offers);
 router.post("/bills", AdminOnly, bills);
 router.post("/deals", AdminOnly, deals);
+router.post("/commitions", AdminOnly, commitions);
 router.post("/settles", AdminOnly, settles);
 router.post("/settleresults", AdminOnly, settleresults);
 router.post("/blocks", AdminOnly, blocks);

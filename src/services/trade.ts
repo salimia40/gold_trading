@@ -468,6 +468,63 @@ export async function getDeals(
   };
 }
 
+export async function getCommitions(
+  user_id: number | null = null,
+  settle_id: number | null = null,
+  is_settled: boolean | null = null,
+  sort: "asc" | "desc" = "asc",
+  paginate: boolean = false,
+  page: number = 1,
+  perPage: number = 10
+) {
+  let query: Prisma.CommitionFindManyArgs = {};
+  let cQuery: Prisma.CommitionCountArgs = {};
+  query.where = {};
+  cQuery.where = {};
+
+  if (user_id != null) {
+    query.where.user_id = user_id;
+    cQuery.where.user_id = user_id;
+  }
+  if (settle_id != null) {
+    query.where.settle_id = settle_id;
+    cQuery.where.settle_id = settle_id;
+  }
+  if (is_settled != null) {
+    query.where.is_settled = is_settled;
+    cQuery.where.is_settled = is_settled;
+  }
+
+  if (sort != null) {
+    query.orderBy = {
+      created_at: sort,
+    };
+  }
+
+  let totalPage: number = 1,
+    total: number;
+  total = await prisma.commition.count(cQuery);
+  if (paginate) {
+    perPage = perPage || 10;
+    totalPage = Math.ceil(total / perPage);
+    if (page > totalPage) {
+      page = 1;
+    }
+    query.skip = (page - 1) * perPage;
+    query.take = perPage;
+  }
+
+  let commitions = await prisma.commition.findMany(query);
+
+  return {
+    items: commitions,
+    page,
+    total,
+    totalPage,
+    perPage,
+  };
+}
+
 export async function makeOffer(
   user_id: number,
   amount: number,

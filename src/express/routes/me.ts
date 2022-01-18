@@ -1,7 +1,7 @@
 import { RequestHandler, Router } from "express";
 import { getBlockResults } from "../../services/block";
 import { getSettleResults } from "../../services/settle";
-import { getBills, getDeals } from "../../services/trade";
+import { getBills, getCommitions, getDeals } from "../../services/trade";
 import { UploadedFile } from "express-fileupload";
 import {
   chargeRequest,
@@ -137,6 +137,23 @@ const myDeals: RequestHandler = async (req, res) => {
   }
 };
 
+const myCommitions: RequestHandler = async (req, res) => {
+  try {
+    let result = await getCommitions(
+      req.user?.id!,
+      req.body.settle_id,
+      req.body.is_settled,
+      req.body.sort,
+      req.body.paginate,
+      req.body.page,
+      req.body.perPage
+    );
+    return res.send(result);
+  } catch (error: any) {
+    res.boom.badRequest(error.message);
+  }
+};
+
 const router = Router();
 
 router.post("/", me);
@@ -145,6 +162,7 @@ router.post("/transactions/requestDischarge", requestDischarge);
 router.post("/transactions/requestCharge", requestCharge);
 router.post("/bills", myBills);
 router.post("/deals", myDeals);
+router.post("/commitions", myCommitions);
 router.post("/blocks", myBlockresults);
 router.post("/settles", mySettleresults);
 
