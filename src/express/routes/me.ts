@@ -228,6 +228,7 @@ const document: RequestHandler = async (req, res) => {
 const router = Router();
 
 router.post("/", me);
+router.post("/notifications", myNotifications);
 router.post("/transactions", myTransactions);
 router.post("/transactions/requestDischarge", requestDischarge);
 router.post("/transactions/requestCharge", requestCharge);
