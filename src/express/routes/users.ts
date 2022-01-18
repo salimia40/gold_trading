@@ -7,6 +7,7 @@ import {
   declineTransaction,
   doTransaction,
   getAvatar,
+  getDocument,
   getTransactions,
   getUser,
   getUsers,
@@ -117,11 +118,21 @@ const avatar: RequestHandler = async (req, res) => {
   }
 };
 
+const document: RequestHandler = async (req, res) => {
+  try {
+    let result = await getDocument(req.body.document_id!);
+    return res.send(result);
+  } catch (error: any) {
+    res.boom.badRequest(error.message);
+  }
+};
+
 const router = Router();
 
 router.post("/", users);
 router.post("/user", user);
 router.post("/avatar", avatar);
+router.post("/document", document);
 router.post("/transactions", transactions);
 router.post("/transactions/decline", decline);
 router.post("/transactions/confirm", confirm);

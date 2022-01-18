@@ -484,7 +484,10 @@ export async function getAvatar(user_id: number) {
   return avatarFile;
 }
 
-export async function getDocument(name: string) {
-  let avatarFile = await get("documents", name);
-  return avatarFile;
+export async function getDocument(document_id: number) {
+  let document = await prisma.document.findUnique({
+    where: { id: document_id },
+  });
+  let documentFile = await get("documents", document?.file!);
+  return documentFile;
 }
