@@ -4,14 +4,17 @@ import { getSettleResults } from "../../services/settle";
 import { getBills, getCommitions, getDeals } from "../../services/trade";
 import { UploadedFile } from "express-fileupload";
 import {
+  addDocument,
   chargeRequest,
   dischargeRequest,
   getAvatar,
+  getDocument,
   getTransactions,
   getUser,
   setAvatar,
 } from "../../services/user";
 import path from "path";
+import { prisma } from "../../services/db";
 
 const me: RequestHandler = async (req, res) => {
   const userId = req.user?.id!;
@@ -177,6 +180,35 @@ const avatarUpload: RequestHandler = async (req, res) => {
     res.boom.badRequest(error.message);
   }
 };
+const documentUpload: RequestHandler = async (req, res) => {
+  const document = req.files?.document! as UploadedFile;
+
+  try {
+    let result = await addDocument(
+      req.user?.id!,
+      document.data,
+      path.extname(document.name)
+    );
+    return res.send(result);
+  } catch (error: any) {
+    res.boom.badRequest(error.message);
+  }
+};
+
+const document: RequestHandler = async (req, res) => {
+  try {
+    let document = await prisma.document.findUnique({
+      where: { id: req.body.document_id! },
+    });
+    if (document?.user_id !== req.user?.id!) {
+      return res.boom.forbidden("not your document");
+    }
+    let result = await getDocument(document?.id!);
+    return res.send(result);
+  } catch (error: any) {
+    res.boom.badRequest(error.message);
+  }
+};
 
 const router = Router();
 
@@ -191,5 +223,7 @@ router.post("/blocks", myBlockresults);
 router.post("/settles", mySettleresults);
 router.post("/avatar", myAvatar);
 router.post("/avatar/set", avatarUpload);
+router.post("/document", document);
+router.post("/document/add", documentUpload);
 
 export default router;

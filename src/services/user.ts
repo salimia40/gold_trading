@@ -491,3 +491,15 @@ export async function getDocument(document_id: number) {
   let documentFile = await get("documents", document?.file!);
   return documentFile;
 }
+
+export async function addDocument(
+  user_id: number,
+  document: Buffer,
+  extname: string
+) {
+  let name = nanoid() + extname;
+  await put("documents", name, document);
+  await prisma.document.create({
+    data: { user_id, file: name, file_type: "image" },
+  });
+}
