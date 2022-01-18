@@ -1,19 +1,23 @@
 import { Prisma } from "@prisma/client";
 import { prisma } from "./db";
 import { emmiter } from "./events";
+import { publishToUser } from "./pushNotifications";
 
 export const notifyUser = async (
   user_id: number,
+  title: string,
   message: string,
   action: string | undefined = undefined
 ) => {
   let notification = await prisma.notification.create({
-    data: { user_id, message, action },
+    data: { user_id, title, message, action },
   });
   emmiter.emit("notification", notification);
+  await publishToUser(user_id, title, message);
 };
 
 export const notifyAdmins = async (
+  title: string,
   message: string,
   action: string | undefined = undefined
 ) => {
@@ -28,11 +32,12 @@ export const notifyAdmins = async (
     },
   });
   admins.forEach(({ id }) => {
-    notifyUser(id, message, action);
+    notifyUser(id, title, message, action);
   });
 };
 
 export const notifyAll = async (
+  title: string,
   message: string,
   action: string | undefined = undefined
 ) => {
@@ -45,7 +50,7 @@ export const notifyAll = async (
     },
   });
   users.forEach(({ id }) => {
-    notifyUser(id, message, action);
+    notifyUser(id, title, message, action);
   });
 };
 

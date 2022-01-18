@@ -278,6 +278,7 @@ model Price {
 
 model Notification {
   id         Int      @id @default(autoincrement())
+  title      String
   message    String
   action     String?
   is_seen    Boolean  @default(false)

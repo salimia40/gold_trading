@@ -85,33 +85,49 @@ export const notificationHandler = (io: Server) => {
     notifyAdmins("A new charge request has been sent", "/transactions");
   });
   emmiter.on("/auctionMargin", (item: Auction) => {
-    notifyUser(item.user_id!, "market price has gotten near margin");
+    notifyUser(item.user_id!, "Margin", "market price has gotten near margin");
   });
   emmiter.on("/auctionHit", (item: Auction) => {
     notifyUser(
       item.user_id!,
+      "Auction",
       "market price has hit your margin. your trades are auctioned"
     );
   });
   emmiter.on("/charge", (item: Transaction) => {
     notifyUser(
       item.user_id!,
+      "Transaction update",
       "your transaction has been updated",
       "/transactions"
     );
   });
   emmiter.on("/settle", (item: Settleresult) => {
-    notifyUser(item.user_id!, "market has been settled", "/settles");
+    notifyUser(
+      item.user_id!,
+      "Market settle",
+      "market has been settled",
+      "/settles"
+    );
   });
   emmiter.on("/block", (item: Blockresult) => {
-    notifyUser(item.user_id!, "daily block has been occured", "/blocks");
+    notifyUser(
+      item.user_id!,
+      "Block",
+      "daily block has been occured",
+      "/blocks"
+    );
   });
   emmiter.on("/setting", (item: [SETTINGS, Setting]) => {
     if (item[0] == "TARADING_ACTIVATED") {
       if (item[1] as boolean) {
-        notifyAll("trading platform activated", "/");
+        notifyAll(
+          "trading platform activated",
+          "trading platform activated",
+          "/"
+        );
       } else {
-        notifyAll("trading platform closed", "/");
+        notifyAll("trading platform closed", "trading platform closed", "/");
       }
     }
   });
