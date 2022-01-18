@@ -1,6 +1,7 @@
 import {
   Auction,
   Blockresult,
+  Chargeinfo,
   Offer,
   Settleresult,
   Transaction,
@@ -17,6 +18,8 @@ export const emmiter = new EventEmitter();
  *      newPrice        (number)
  *      auctionMargin   (Auction)
  *      auctionHit      (Auction)
+ *      auction         (Auction)
+ *      newCharge       (Chargeinfo)
  *      charge          (Transaction)
  *      chargeRequest   (Transaction)
  *      settle          (Settleresult)
@@ -43,6 +46,12 @@ export const sockethHandler = (io: Server) => {
   });
   emmiter.on("/auctionHit", (item: Auction) => {
     io.to(`/auctionHit/${item.user_id}`).emit("/auctionHit", item);
+  });
+  emmiter.on("/auction", (item: Auction) => {
+    io.to(`/auction/${item.user_id}`).emit("/auction", item);
+  });
+  emmiter.on("/newCharge", (item: Chargeinfo) => {
+    io.to(`/newCharge/${item.user_id}`).emit("/newCharge", item);
   });
   emmiter.on("/auctionMargin", (item: Auction) => {
     io.to(`/auctionMargin/${item.user_id}`).emit("/auctionMargin", item);

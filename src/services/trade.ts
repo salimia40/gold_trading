@@ -1,4 +1,4 @@
-import { Bill, User_role } from ".prisma/client";
+import { Bill, Chargeinfo, User_role } from ".prisma/client";
 import { prisma } from "./db";
 import setting from "./setting";
 import { forEach, reduce } from "p-iteration";
@@ -176,8 +176,9 @@ async function makeDeals(bill: Bill) {
 }
 
 async function addCharge(user_id: number, charge: number) {
+  let chargeinfo: Chargeinfo;
   if (charge < 0) {
-    await prisma.chargeinfo.update({
+    chargeinfo = await prisma.chargeinfo.update({
       where: { user_id },
       data: {
         charge: {
@@ -186,7 +187,7 @@ async function addCharge(user_id: number, charge: number) {
       },
     });
   } else {
-    await prisma.chargeinfo.update({
+    chargeinfo = await prisma.chargeinfo.update({
       where: { user_id },
       data: {
         charge: {
@@ -195,6 +196,7 @@ async function addCharge(user_id: number, charge: number) {
       },
     });
   }
+  emmiter.emit("newCharge", chargeinfo);
 }
 
 export async function processTrade(

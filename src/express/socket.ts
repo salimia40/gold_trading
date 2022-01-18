@@ -4,32 +4,6 @@ import { Server } from "socket.io";
 import { prisma } from "../services/db";
 import { decriptToken } from "./routes/auth";
 
-// interface SocketRegister {
-//   socketId: string;
-//   userId: number;
-// }
-
-// class SocketRegistery {
-//   private sockets: SocketRegister[];
-
-//   constructor() {
-//     this.sockets = [];
-//   }
-
-//   register(item: SocketRegister) {
-//     this.sockets.push(item);
-//   }
-
-//   disconnect(socketId: string) {
-//     this.sockets = this.sockets.filter((item) => item.socketId !== socketId);
-//   }
-
-//   getSocket(userId: number) {
-//     return this.sockets.find((item) => item.userId !== userId);
-//   }
-// }
-// export const socketRegistery = new SocketRegistery();
-
 const createSocket = (httpServer: HttpServer) => {
   const io = new Server(httpServer, {
     /* options */
@@ -76,6 +50,8 @@ const createSocket = (httpServer: HttpServer) => {
     socket.join(`/offer`);
     socket.join(`/auctionHit/${userId}`);
     socket.join(`/auctionMargin/${userId}`);
+    socket.join(`/auction/${userId}`);
+    socket.join(`/newCharge/${userId}`);
     socket.join(`/charge/${userId}`);
     socket.join(`/settle/${userId}`);
     socket.join(`/block/${userId}`);

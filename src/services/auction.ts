@@ -21,8 +21,6 @@ export async function countAuction(user_id: number) {
     },
   });
 
-  console.info(bills);
-
   let amount = await reduce(
     bills,
     (acc, bill) => {
@@ -30,15 +28,12 @@ export async function countAuction(user_id: number) {
     },
     0
   );
-  console.info(amount);
 
   let is_sell = amount > 0;
-  console.info(is_sell);
 
   let filteredBills = await filter(bills, (bill) => {
     return bill.is_sell == is_sell;
   });
-  console.info(filteredBills);
 
   amount = 0;
   let value = 0;
@@ -46,23 +41,13 @@ export async function countAuction(user_id: number) {
     amount += bill.left_amount!;
     value += bill.price?.times(bill.left_amount!)!.toNumber()!;
   });
-  console.info(amount, value);
 
   if (amount == 0) {
-    await prisma.auction.update({
-      where: { user_id },
-      data: {
-        is_sell,
-        price: 0,
-        margin: 0,
-        is_triggered: false,
-      },
-    });
+    await saveAuction(user_id, is_sell, 0, 0);
     return;
   }
 
   let avrage = amount == 0 ? 0 : value / amount;
-  console.info("avrage: ", avrage);
 
   let price = chargeInfo?.charge
     .mul(4.3318)
@@ -70,32 +55,38 @@ export async function countAuction(user_id: number) {
     .mul(0.85)
     .dividedBy(amount)
     .toNumber()!;
-  console.info("price: ", price);
 
   price = is_sell ? avrage + price : avrage - price;
   price = is_sell ? Math.ceil(price) : Math.floor(price);
-  console.info("price: ", price);
 
   let tolerence = (await setting.get("TOLERENCE")) as number;
 
   let margin = is_sell ? price + tolerence : price - tolerence;
-  console.info("margin: ", margin);
 
   try {
-    await prisma.auction.update({
-      where: { user_id },
-      data: {
-        is_sell,
-        price,
-        margin,
-        is_triggered: false,
-      },
-    });
+    await saveAuction(user_id, is_sell, price, margin);
+    await checkAuction(user_id);
   } catch (error) {
-    console.error(error);
+    throw error;
   }
+}
 
-  await checkAuction(user_id);
+async function saveAuction(
+  user_id: number,
+  is_sell: boolean,
+  price: number,
+  margin: number
+) {
+  let auction = await prisma.auction.update({
+    where: { user_id },
+    data: {
+      is_sell,
+      price,
+      margin,
+      is_triggered: false,
+    },
+  });
+  emmiter.emit("auction", auction);
 }
 
 export const priceEvent = new Subject<number>();
