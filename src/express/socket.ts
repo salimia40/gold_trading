@@ -72,6 +72,7 @@ const createSocket = (httpServer: HttpServer) => {
     }
 
     socket.join(`/newPrice`);
+    socket.join(`/setting`);
     socket.join(`/offer`);
     socket.join(`/auctionHit/${userId}`);
     socket.join(`/auctionMargin/${userId}`);

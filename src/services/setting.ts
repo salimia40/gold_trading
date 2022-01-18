@@ -128,6 +128,8 @@ class Settings {
     if (setting == "QUOTATION") {
       await prisma.price.create({ data: { value: value as number } });
       emmiter.emit("newPrice", value);
+    } else {
+      emmiter.emit("setting", [setting, value]);
     }
   }
 }

@@ -22,6 +22,7 @@ export const emmiter = new EventEmitter();
  *      settle          (Settleresult)
  *      block           (Blockresult)
  *      offer           (Offer)
+ *      setting         [setting , value]
  */
 
 export const sockethHandler = (io: Server) => {
@@ -54,5 +55,8 @@ export const sockethHandler = (io: Server) => {
   });
   emmiter.on("/block", (item: Blockresult) => {
     io.to(`/block/${item.user_id}`).emit("/block", item);
+  });
+  emmiter.on("/setting", (item: []) => {
+    io.to(`/setting`).emit("/setting", item);
   });
 };
